@@ -1,0 +1,89 @@
+﻿<Window x:Class="CadBIMHub.LogoutWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Đăng xuất" 
+    Height="290" 
+    Width="420"
+    MinHeight="290"
+    MinWidth="420"
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="NoResize"
+    Background="#F5F5F5">
+<Grid Margin="20">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="15"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="15"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="15"/>
+        <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="&#xE7E8;" 
+                       FontFamily="Segoe MDL2 Assets" 
+                       FontSize="32" 
+                       Foreground="#FF9800"
+                       Margin="0,0,10,0"
+                       VerticalAlignment="Center"/>
+            <TextBlock Text="Xác Nhận Đăng Xuất" 
+                       FontSize="18" 
+                       FontWeight="Bold"
+                       Foreground="#333"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Border Grid.Row="2" 
+                Background="White" 
+                BorderBrush="#E0E0E0" 
+                BorderThickness="1"
+                Padding="15">
+            <StackPanel>
+                <TextBlock Text="Thông tin đăng nhập" 
+                           FontWeight="SemiBold" 
+                           Foreground="#666"
+                           Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Người dùng: " 
+                               Foreground="#888"
+                               Width="100"/>
+                    <TextBlock x:Name="txtCurrentUser" 
+                               FontWeight="Bold" 
+                               Foreground="#007ACC"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="4" 
+                   Text="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?"
+                   FontSize="13"
+                   Foreground="#666"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"/>
+
+        <StackPanel Grid.Row="6" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center">
+            <Button x:Name="btnLogout" 
+                    Content="Đăng xuất" 
+                    Width="120" 
+                    Height="35"
+                    Margin="0,0,10,0"
+                    Background="#F44336"
+                    Foreground="White"
+                    FontWeight="SemiBold"
+                    FontSize="13"
+                    Click="btnLogout_Click"/>
+            <Button x:Name="btnCancel" 
+                    Content="Hủy" 
+                    Width="120" 
+                    Height="35"
+                    Background="#E0E0E0"
+                    Foreground="#333"
+                    FontWeight="SemiBold"
+                    FontSize="13"
+                    Click="btnCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
