@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -90,6 +90,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="Models\BatchInfoModel.cs" />
+    <Compile Include="Models\RouteDetailModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -114,12 +117,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AppCommands.cs" />
-    <Compile Include="Helpers\RibbonStateManager.cs" />
-    <Compile Include="Helpers\AuthenticationManager.cs" />
+    <Page Include="Resources\Buttons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CreateRouteWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="ViewModels\CreateRouteViewModel.cs" />
+    <Compile Include="Views\CreateRouteWindow.xaml.cs">
+      <DependentUpon>CreateRouteWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -130,12 +142,11 @@
     <Compile Include="Views\LogoutWindow.xaml.cs">
       <DependentUpon>LogoutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AuthenticationManager.cs" />
+    <Compile Include="Helpers\RibbonStateManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Actions\" />
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

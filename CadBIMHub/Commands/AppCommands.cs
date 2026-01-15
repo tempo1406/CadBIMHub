@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
+using CadBIMHub.Views;
 
 namespace CadBIMHub
 {
@@ -74,6 +75,30 @@ namespace CadBIMHub
             catch (System.Exception ex)
             {
                 ed.WriteMessage("\nLỗi khi đăng xuất" + ex.Message);
+            }
+        }
+
+        [CommandMethod("CADBIM_CREATE_ROUTE")]
+        public void CreateRoute()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Editor ed = doc.Editor;
+
+            if (!AuthenticationManager.Instance.IsAuthenticated)
+            {
+                ed.WriteMessage("\nBan can dang nhap de su dung chuc nang nay!");
+                return;
+            }
+
+            try
+            {
+                CreateRouteWindow createRouteWindow = new CreateRouteWindow();
+                Application.ShowModalWindow(createRouteWindow);
+                ed.WriteMessage("\nDong cua so Tao lo");
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage("\nLoi khi tao lo: " + ex.Message);
             }
         }
     }
