@@ -51,8 +51,23 @@
                            FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <Button Content="Xóa" Width="70" Height="28" Margin="15,0,0,0"
-                    Style="{StaticResource BtnGreyOutline}"
-                    Command="{Binding DeleteCommand}"/>
+                                Command="{Binding DeleteCommand}"
+                                IsEnabled="{Binding HasItemsSelected}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource BtnGreyOutline}">
+                                    <Setter Property="Background" Value="#9e9e9e"/>
+                                    <Setter Property="BorderBrush" Value="#9e9e9e"/>
+                                    <Setter Property="Foreground" Value="#666"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasItemsSelected}" Value="True">
+                                            <Setter Property="Background" Value="#dc3545"/>
+                                            <Setter Property="BorderBrush" Value="#dc3545"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
 
                     <DataGrid Grid.Row="2" 
@@ -67,8 +82,7 @@
                   BorderBrush="#e0e0e0"
                   RowHeaderWidth="0"
                   Background="White"
-                  RowHeight="45"
-                  SelectionChanged="dgRouteDetails_SelectionChanged">
+                  RowHeight="45">
                         <DataGrid.Resources>
                             <Style TargetType="DataGridRow">
                                 <Setter Property="Background" Value="White"/>
@@ -124,8 +138,16 @@
                         </DataGrid.ColumnHeaderStyle>
                         
                         <DataGrid.Columns>
-                            <!-- Checkbox Column -->
+                            <!-- Checkbox Column with Select All -->
                             <DataGridTemplateColumn Width="40">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  Command="{Binding DataContext.ToggleSelectAllCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                  CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
+                                                  ToolTip="Select All"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
@@ -134,12 +156,13 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
+
                             <!-- Text Column: Ten Lo -->
                             <DataGridTemplateColumn Header="Tên lộ" Width="60">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource InputBorderStyle}">
-                                            <TextBox Text="{Binding TenLo, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Text="{Binding RouteName, UpdateSourceTrigger=PropertyChanged}" 
                                                      BorderThickness="0" Background="Transparent"
                                                      VerticalContentAlignment="Center" Padding="4"/>
                                         </Border>
@@ -147,45 +170,54 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- ComboBox Column: Batch -->
+                            <!-- TextBox Column: Batch -->
                             <DataGridTemplateColumn Header="Batch" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox SelectedItem="{Binding Batch, UpdateSourceTrigger=PropertyChanged}"
-                                                  Margin="4,2" VerticalContentAlignment="Center"/>
+                                        <Border Style="{StaticResource InputBorderStyle}">
+                                            <TextBox Text="{Binding BatchNo, UpdateSourceTrigger=PropertyChanged}" 
+                                                     BorderThickness="0" Background="Transparent"
+                                                     VerticalContentAlignment="Center" Padding="4"/>
+                                        </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- ComboBox Column: Nhom Vat Tu -->
+                            <!-- TextBox Column: ItemGroup -->
                             <DataGridTemplateColumn Header="Nhóm vật tư" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding DataContext.NhomVatTuList, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                  SelectedItem="{Binding NhomVatTu, UpdateSourceTrigger=PropertyChanged}"
-                                                  Margin="4,2" VerticalContentAlignment="Center"/>
+                                        <Border Style="{StaticResource InputBorderStyle}">
+                                            <TextBox Text="{Binding ItemGroup, UpdateSourceTrigger=PropertyChanged}" 
+                                                     BorderThickness="0" Background="Transparent"
+                                                     VerticalContentAlignment="Center" Padding="4"/>
+                                        </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- ComboBox Column: Vat Tu -->
+                            <!-- TextBox Column: ItemDescription -->
                             <DataGridTemplateColumn Header="Vật tư" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding DataContext.VatTuList, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                  SelectedItem="{Binding VatTu, UpdateSourceTrigger=PropertyChanged}"
-                                                  Margin="4,2" VerticalContentAlignment="Center"/>
+                                        <Border Style="{StaticResource InputBorderStyle}">
+                                            <TextBox Text="{Binding ItemDescription, UpdateSourceTrigger=PropertyChanged}" 
+                                                     BorderThickness="0" Background="Transparent"
+                                                     VerticalContentAlignment="Center" Padding="4"/>
+                                        </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- ComboBox Column: Kich Thuoc -->
+                            <!-- TextBox Column: Size -->
                             <DataGridTemplateColumn Header="Kích thước" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding DataContext.KichThuocList, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                  SelectedItem="{Binding KichThuoc, UpdateSourceTrigger=PropertyChanged}"
-                                                  Margin="4,2" VerticalContentAlignment="Center"/>
+                                        <Border Style="{StaticResource InputBorderStyle}">
+                                            <TextBox Text="{Binding Size, UpdateSourceTrigger=PropertyChanged}" 
+                                                     BorderThickness="0" Background="Transparent"
+                                                     VerticalContentAlignment="Center" Padding="4"/>
+                                        </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -195,7 +227,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource InputBorderStyle}">
-                                            <TextBox Text="{Binding KyHieu, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Text="{Binding Symbol, UpdateSourceTrigger=PropertyChanged}" 
                                                      BorderThickness="0" Background="Transparent"
                                                      VerticalContentAlignment="Center" Padding="4"/>
                                         </Border>
@@ -208,7 +240,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource InputBorderStyle}">
-                                            <TextBox Text="{Binding SoLuong, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" 
                                                      BorderThickness="0" Background="Transparent"
                                                      VerticalContentAlignment="Center" Padding="4"/>
                                         </Border>
@@ -259,13 +291,29 @@
                     <StackPanel Grid.Row="3" Orientation="Horizontal" 
                     HorizontalAlignment="Right" Margin="0,15,0,0">
                         <Button Content="Gán" Width="100" Height="35" 
-                    Margin="0,0,10,0"
-                    Style="{StaticResource BtnBlueFilled}"
-                    Command="{Binding AssignCommand}"/>
+                                Margin="0,0,10,0"
+                                Command="{Binding AssignCommand}"
+                                IsEnabled="{Binding HasChanges}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource BtnGreyOutline}">
+                                    <Setter Property="Background" Value="#9e9e9e"/>
+                                    <Setter Property="BorderBrush" Value="#9e9e9e"/>
+                                    <Setter Property="Foreground" Value="#666"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasChanges}" Value="True">
+                                            <Setter Property="Background" Value="#3f51b5"/>
+                                            <Setter Property="BorderBrush" Value="#3f51b5"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Button Content="Đóng" Width="100" Height="35"
                     Style="{StaticResource BtnRedFilled}"
                     Command="{Binding CloseCommand}"/>
                     </StackPanel>
+
                 </Grid>
             </TabItem>
 
@@ -353,11 +401,11 @@
                                     </Style>
                                 </DataGrid.ColumnHeaderStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Mã batch" Binding="{Binding MaBatch}" Width="*"/>
-                                    <DataGridTextColumn Header="Điều kiện lắp đặt" Binding="{Binding DieuKienLapDat}" Width="*"/>
-                                    <DataGridTextColumn Header="Không gian lắp đặt" Binding="{Binding KhongGianLapDat}" Width="*"/>
-                                    <DataGridTextColumn Header="Gói công việc" Binding="{Binding GoiCongViec}" Width="*"/>
-                                    <DataGridTextColumn Header="Giai đoạn" Binding="{Binding GiaiDoan}" Width="*"/>
+                                    <DataGridTextColumn Header="Mã batch" Binding="{Binding BatchCode}" Width="*"/>
+                                    <DataGridTextColumn Header="Điều kiện lắp đặt" Binding="{Binding InstallationCondition}" Width="*"/>
+                                    <DataGridTextColumn Header="Không gian lắp đặt" Binding="{Binding InstallationSpace}" Width="*"/>
+                                    <DataGridTextColumn Header="Gói công việc" Binding="{Binding WorkPackage}" Width="*"/>
+                                    <DataGridTextColumn Header="Giai đoạn" Binding="{Binding Phase}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 
 namespace CadBIMHub.Models
@@ -5,93 +6,98 @@ namespace CadBIMHub.Models
     public class RouteDetailModel : INotifyPropertyChanged
     {
         private bool _isSelected;
-        private string _tenLo;
-        private string _batch;
-        private string _nhomVatTu;
-        private string _vatTu;
-        private string _kichThuoc;
-        private string _kyHieu;
-        private string _soLuong;
+        private string _routeName;
+        private string _batchNo;
+        private string _itemGroup;
+        private string _itemDescription;
+        private string _size;
+        private string _symbol;
+        private string _quantity;
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public static event EventHandler SelectionChanged;
 
         public bool IsSelected
         {
             get => _isSelected;
             set
             {
-                _isSelected = value;
-                OnPropertyChanged(nameof(IsSelected));
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 
-        public string TenLo
+        public string RouteName
         {
-            get => _tenLo;
+            get => _routeName;
             set
             {
-                _tenLo = value;
-                OnPropertyChanged(nameof(TenLo));
+                _routeName = value;
+                OnPropertyChanged(nameof(RouteName));
             }
         }
 
-        public string Batch
+        public string BatchNo
         {
-            get => _batch;
+            get => _batchNo;
             set
             {
-                _batch = value;
-                OnPropertyChanged(nameof(Batch));
+                _batchNo = value;
+                OnPropertyChanged(nameof(BatchNo));
             }
         }
 
-        public string NhomVatTu
+        public string ItemGroup
         {
-            get => _nhomVatTu;
+            get => _itemGroup;
             set
             {
-                _nhomVatTu = value;
-                OnPropertyChanged(nameof(NhomVatTu));
+                _itemGroup = value;
+                OnPropertyChanged(nameof(ItemGroup));
             }
         }
 
-        public string VatTu
+        public string ItemDescription
         {
-            get => _vatTu;
+            get => _itemDescription;
             set
             {
-                _vatTu = value;
-                OnPropertyChanged(nameof(VatTu));
+                _itemDescription = value;
+                OnPropertyChanged(nameof(ItemDescription));
             }
         }
 
-        public string KichThuoc
+        public string Size
         {
-            get => _kichThuoc;
+            get => _size;
             set
             {
-                _kichThuoc = value;
-                OnPropertyChanged(nameof(KichThuoc));
+                _size = value;
+                OnPropertyChanged(nameof(Size));
             }
         }
 
-        public string KyHieu
+        public string Symbol
         {
-            get => _kyHieu;
+            get => _symbol;
             set
             {
-                _kyHieu = value;
-                OnPropertyChanged(nameof(KyHieu));
+                _symbol = value;
+                OnPropertyChanged(nameof(Symbol));
             }
         }
 
-        public string SoLuong
+        public string Quantity
         {
-            get => _soLuong;
+            get => _quantity;
             set
             {
-                _soLuong = value;
-                OnPropertyChanged(nameof(SoLuong));
+                _quantity = value;
+                OnPropertyChanged(nameof(Quantity));
             }
         }
 
@@ -101,3 +107,4 @@ namespace CadBIMHub.Models
         }
     }
 }
+

@@ -1,8 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using CadBIMHub.Helpers;
 using CadBIMHub.Models;
 
@@ -17,103 +20,39 @@ namespace CadBIMHub.ViewModels
         private string _selectedGoiCongViec;
         private string _selectedGiaiDoan;
         private int _selectedCount;
+        private bool _hasChanges;
 
         public CreateRouteViewModel()
         {
             InitializeCollections();
             InitializeCommands();
             InitializeSampleData();
+            
+            RouteDetailModel.SelectionChanged += (s, e) => UpdateSelectedCount();
+            
+            RouteDetailList.CollectionChanged += (s, e) => HasChanges = true;
+            BatchList.CollectionChanged += (s, e) => HasChanges = true;
         }
 
         private void InitializeCollections()
         {
-            DieuKienLapDatList = new ObservableCollection<string>
-            {
-                "1 gian giao",
-                "2 gian giao",
-                "3 gian giao",
-                "Khong gian giao"
-            };
-
-            KhongGianLapDatList = new ObservableCollection<string>
-            {
-                "Lap am san",
-                "Lap noi san",
-                "Lap am tran",
-                "Lap noi tran",
-                "Lap tuong"
-            };
-
-            GoiCongViecList = new ObservableCollection<string>
-            {
-                "D_428_Bom",
-                "D_428_10cm",
-                "D_428_12cm",
-                "D_315_8cm",
-                "D_315_10cm"
-            };
-
-            GiaiDoanList = new ObservableCollection<string>
-            {
-                "CD1",
-                "CD2",
-                "CD3",
-                "CD4"
-            };
-
-            NhomVatTuList = new ObservableCollection<string>
-            {
-                "Day & cap",
-                "Ong",
-                "Hop noi",
-                "Phu kien"
-            };
-
-            VatTuList = new ObservableCollection<string>
-            {
-                "Cap tin",
-                "Day dien",
-                "Day cap",
-                "Ong luon"
-            };
-
-            KichThuocList = new ObservableCollection<string>
-            {
-                "1x",
-                "2x",
-                "3x",
-                "4x"
-            };
-
             BatchList = new ObservableCollection<BatchInfoModel>();
             RouteDetailList = new ObservableCollection<RouteDetailModel>();
-
-            SelectedDieuKien = DieuKienLapDatList.FirstOrDefault();
-            SelectedKhongGian = KhongGianLapDatList.FirstOrDefault();
-            SelectedGoiCongViec = GoiCongViecList.FirstOrDefault();
-            SelectedGiaiDoan = GiaiDoanList.FirstOrDefault();
         }
 
         private void InitializeCommands()
         {
             SaveBatchCommand = new RelayCommand(SaveBatch);
-            ImportCommand = new RelayCommand(Import);
             CreateNewCommand = new RelayCommand(CreateNew);
             DeleteCommand = new RelayCommand(Delete);
             DeleteRowCommand = new RelayCommand<RouteDetailModel>(DeleteRow);
             CopyRowCommand = new RelayCommand<RouteDetailModel>(CopyRow);
             CloseCommand = new RelayCommand(CloseDialog);
             AssignCommand = new RelayCommand(Assign);
+            ToggleSelectAllCommand = new RelayCommand<bool?>(ToggleSelectAll);
         }
 
         #region Collections
-        public ObservableCollection<string> DieuKienLapDatList { get; set; }
-        public ObservableCollection<string> KhongGianLapDatList { get; set; }
-        public ObservableCollection<string> GoiCongViecList { get; set; }
-        public ObservableCollection<string> GiaiDoanList { get; set; }
-        public ObservableCollection<string> NhomVatTuList { get; set; }
-        public ObservableCollection<string> VatTuList { get; set; }
-        public ObservableCollection<string> KichThuocList { get; set; }
         public ObservableCollection<BatchInfoModel> BatchList { get; set; }
         public ObservableCollection<RouteDetailModel> RouteDetailList { get; set; }
         #endregion
@@ -166,6 +105,19 @@ namespace CadBIMHub.ViewModels
             {
                 _selectedCount = value;
                 OnPropertyChanged(nameof(SelectedCount));
+                OnPropertyChanged(nameof(HasItemsSelected));
+            }
+        }
+
+        public bool HasItemsSelected => SelectedCount > 0;
+
+        public bool HasChanges
+        {
+            get => _hasChanges;
+            set
+            {
+                _hasChanges = value;
+                OnPropertyChanged(nameof(HasChanges));
             }
         }
         #endregion
@@ -179,6 +131,7 @@ namespace CadBIMHub.ViewModels
         public ICommand CopyRowCommand { get; private set; }
         public ICommand CloseCommand { get; private set; }
         public ICommand AssignCommand { get; private set; }
+        public ICommand ToggleSelectAllCommand { get; private set; }
 
         public Action CloseAction { get; set; }
         #endregion
@@ -188,32 +141,28 @@ namespace CadBIMHub.ViewModels
         {
             var batch = new BatchInfoModel
             {
-                MaBatch = string.Format("B{0:D3}", BatchList.Count + 1),
-                DieuKienLapDat = SelectedDieuKien,
-                KhongGianLapDat = SelectedKhongGian,
-                GoiCongViec = SelectedGoiCongViec,
-                GiaiDoan = SelectedGiaiDoan
+                BatchCode = string.Format("B{0:D3}", BatchList.Count + 1),
+                InstallationCondition = SelectedDieuKien,
+                InstallationSpace = SelectedKhongGian,
+                WorkPackage = SelectedGoiCongViec,
+                Phase = SelectedGiaiDoan
             };
             BatchList.Add(batch);
         }
 
-        private void Import()
-        {
-            // TODO: Implement import functionality
-        }
 
         private void CreateNew()
         {
-            var newDetail = new RouteDetailModel
+            var newDetail = new RouteDetailModel { };
+            
+            newDetail.PropertyChanged += (s, e) => 
             {
-                TenLo = (RouteDetailList.Count + 1).ToString(),
-                Batch = "",
-                NhomVatTu = "Day & cap",
-                VatTu = "Day dien",
-                KichThuoc = "1x",
-                KyHieu = string.Format("D{0}", RouteDetailList.Count + 1),
-                SoLuong = "1"
+                if (e.PropertyName != nameof(RouteDetailModel.IsSelected))
+                {
+                    HasChanges = true;
+                }
             };
+            
             RouteDetailList.Add(newDetail);
         }
 
@@ -225,6 +174,15 @@ namespace CadBIMHub.ViewModels
                 RouteDetailList.Remove(item);
             }
             UpdateSelectedCount();
+        }
+
+        private void ToggleSelectAll(bool? isChecked)
+        {
+            bool selectAll = isChecked ?? false;
+            foreach (var item in RouteDetailList)
+            {
+                item.IsSelected = selectAll;
+            }
         }
 
         private void DeleteRow(RouteDetailModel detail)
@@ -242,13 +200,13 @@ namespace CadBIMHub.ViewModels
             {
                 var copy = new RouteDetailModel
                 {
-                    TenLo = detail.TenLo,
-                    Batch = detail.Batch,
-                    NhomVatTu = detail.NhomVatTu,
-                    VatTu = detail.VatTu,
-                    KichThuoc = detail.KichThuoc,
-                    KyHieu = detail.KyHieu,
-                    SoLuong = detail.SoLuong
+                    RouteName = detail.RouteName,
+                    BatchNo = detail.BatchNo,
+                    ItemGroup = detail.ItemGroup,
+                    ItemDescription = detail.ItemDescription,
+                    Size = detail.Size,
+                    Symbol = detail.Symbol,
+                    Quantity = detail.Quantity
                 };
                 RouteDetailList.Add(copy);
             }
@@ -261,18 +219,135 @@ namespace CadBIMHub.ViewModels
 
         private void Assign()
         {
-            // TODO: Implement assign functionality
-            CloseAction?.Invoke();
+            try
+            {
+                Document doc = Application.DocumentManager.MdiActiveDocument;
+                if (doc == null)
+                {
+                    System.Windows.MessageBox.Show("Không tìm thấy document AutoCAD", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+
+                Database db = doc.Database;
+
+                DictionaryManager.SaveRoutesToDrawing(RouteDetailList.ToList(), db);
+
+                DictionaryManager.SaveBatchesToDrawing(BatchList.ToList(), db);
+
+                HasChanges = false;
+
+                System.Windows.MessageBox.Show($"Đã lưu thành công {RouteDetailList.Count} routes và {BatchList.Count} batches vào Drawing!", "Thành công", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                
+                CloseAction?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Lỗi khi lưu: {ex.Message}", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
         #endregion
 
         private void InitializeSampleData()
         {
-            RouteDetailList.Add(new RouteDetailModel { TenLo = "1", Batch = "", NhomVatTu = "Day & cap", VatTu = "Cap tin", KichThuoc = "1x", KyHieu = "D2", SoLuong = "1" });
-            RouteDetailList.Add(new RouteDetailModel { TenLo = "2", Batch = "", NhomVatTu = "Day & cap", VatTu = "Day dien", KichThuoc = "1x", KyHieu = "D1", SoLuong = "2" });
-            RouteDetailList.Add(new RouteDetailModel { TenLo = "3", Batch = "", NhomVatTu = "Day & cap", VatTu = "Day dien", KichThuoc = "2x", KyHieu = "A", SoLuong = "3" });
-            RouteDetailList.Add(new RouteDetailModel { TenLo = "4", Batch = "", NhomVatTu = "Day & cap", VatTu = "Day dien", KichThuoc = "2x", KyHieu = "C6", SoLuong = "4" });
-            RouteDetailList.Add(new RouteDetailModel { TenLo = "5", Batch = "", NhomVatTu = "Day & cap", VatTu = "Day dien", KichThuoc = "1x", KyHieu = "D2", SoLuong = "1" });
+            try
+            {
+                Document doc = Application.DocumentManager.MdiActiveDocument;
+                if (doc != null)
+                {
+                    Database db = doc.Database;
+
+                    var routesFromDict = DictionaryManager.LoadRoutesFromDrawing(db);
+                    var batchesFromDict = DictionaryManager.LoadBatchesFromDrawing(db);
+
+                    if (routesFromDict.Count > 0)
+                    {
+                        foreach (var route in routesFromDict)
+                        {
+                            route.PropertyChanged += (s, e) => 
+                            {
+                                if (e.PropertyName != nameof(RouteDetailModel.IsSelected))
+                                {
+                                    HasChanges = true;
+                                }
+                            };
+                            
+                            RouteDetailList.Add(route);
+                        }
+
+                        foreach (var batch in batchesFromDict)
+                        {
+                            BatchList.Add(batch);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            LoadDataFromJson();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        LoadDataFromJson();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void LoadDataFromJson()
+        {
+            string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "requeset.json");
+            
+            if (!File.Exists(jsonPath))
+            {
+                throw new FileNotFoundException($"Không tìm thấy file: {jsonPath}");
+            }
+
+            string jsonContent = File.ReadAllText(jsonPath);
+            var response = SimpleJsonParser.ParseRouteData(jsonContent);
+
+            if (response == null || response.Items == null || response.Items.Count == 0)
+            {
+                throw new Exception("Không có dữ liệu trong JSON");
+            }
+
+            RouteDetailList.Clear();
+
+            foreach (var item in response.Items)
+            {
+                var routeDetail = new RouteDetailModel
+                {
+                    RouteName = item.Name,
+                    BatchNo = item.BatchNo,
+                    ItemGroup = item.ItemGroupName,
+                    ItemDescription = item.ItemDescription,
+                    Size = item.SizeName,
+                    Symbol = item.Symbol,
+                    Quantity = item.Quantity.ToString()
+                };
+                
+                routeDetail.PropertyChanged += (s, e) => 
+                {
+                    if (e.PropertyName != nameof(RouteDetailModel.IsSelected))
+                    {
+                        HasChanges = true;
+                    }
+                };
+                
+                RouteDetailList.Add(routeDetail);
+            }
         }
 
         public void UpdateSelectedCount()
