@@ -90,12 +90,17 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AppCommands.cs" />
+    <Compile Include="Helpers\AuthenticationManager.cs" />
     <Compile Include="Helpers\DictionaryManager.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="Helpers\RibbonStateManager.cs" />
     <Compile Include="Helpers\SimpleJsonParser.cs" />
     <Compile Include="Models\BatchInfoModel.cs" />
     <Compile Include="Models\RouteDetailModel.cs" />
     <Compile Include="Models\RouteItemDto.cs" />
+    <Compile Include="ViewModels\CreateRouteViewModel.cs" />
+    <Compile Include="ViewModels\ImportRouteViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -117,40 +122,45 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="requeset.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\AppCommands.cs" />
     <Page Include="Resources\Buttons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CreateRouteWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Views\CreateRouteWindow.xaml.cs">
+      <DependentUpon>CreateRouteWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Views\ImportRouteWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\LoginWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="ViewModels\CreateRouteViewModel.cs" />
-    <Compile Include="Views\CreateRouteWindow.xaml.cs">
-      <DependentUpon>CreateRouteWindow.xaml</DependentUpon>
+    <Compile Include="Views\ImportRouteWindow.xaml.cs">
+      <DependentUpon>ImportRouteWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\LogoutWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="Views\LogoutWindow.xaml.cs">
       <DependentUpon>LogoutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\AuthenticationManager.cs" />
-    <Compile Include="Helpers\RibbonStateManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Actions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Graphicloads-Android-Settings-Cloud.512.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

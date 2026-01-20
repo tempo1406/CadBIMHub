@@ -29,6 +29,11 @@ namespace CadBIMHub.Helpers
         {
             _execute();
         }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
+        }
     }
 
     public class RelayCommand<T> : ICommand

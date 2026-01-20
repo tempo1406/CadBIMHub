@@ -38,11 +38,40 @@ namespace CadBIMHub.ViewModels
         {
             BatchList = new ObservableCollection<BatchInfoModel>();
             RouteDetailList = new ObservableCollection<RouteDetailModel>();
+            
+            DieuKienLapDatList = new ObservableCollection<string> 
+            { 
+                "Điều kiện 1", 
+                "Điều kiện 2", 
+                "Điều kiện 3" 
+            };
+            
+            KhongGianLapDatList = new ObservableCollection<string> 
+            { 
+                "Không gian 1", 
+                "Không gian 2", 
+                "Không gian 3" 
+            };
+            
+            GoiCongViecList = new ObservableCollection<string> 
+            { 
+                "Gói 1", 
+                "Gói 2", 
+                "Gói 3" 
+            };
+            
+            GiaiDoanList = new ObservableCollection<string> 
+            { 
+                "Giai đoạn 1", 
+                "Giai đoạn 2", 
+                "Giai đoạn 3" 
+            };
         }
 
         private void InitializeCommands()
         {
             SaveBatchCommand = new RelayCommand(SaveBatch);
+            ImportCommand = new RelayCommand(Import);
             CreateNewCommand = new RelayCommand(CreateNew);
             DeleteCommand = new RelayCommand(Delete);
             DeleteRowCommand = new RelayCommand<RouteDetailModel>(DeleteRow);
@@ -55,6 +84,10 @@ namespace CadBIMHub.ViewModels
         #region Collections
         public ObservableCollection<BatchInfoModel> BatchList { get; set; }
         public ObservableCollection<RouteDetailModel> RouteDetailList { get; set; }
+        public ObservableCollection<string> DieuKienLapDatList { get; set; }
+        public ObservableCollection<string> KhongGianLapDatList { get; set; }
+        public ObservableCollection<string> GoiCongViecList { get; set; }
+        public ObservableCollection<string> GiaiDoanList { get; set; }
         #endregion
 
         #region Properties
@@ -148,6 +181,15 @@ namespace CadBIMHub.ViewModels
                 Phase = SelectedGiaiDoan
             };
             BatchList.Add(batch);
+        }
+
+        private void Import()
+        {
+            var importWindow = new Views.ImportRouteWindow();
+            if (importWindow.ShowDialog() == true)
+            {
+                // Handle imported data if needed
+            }
         }
 
 
