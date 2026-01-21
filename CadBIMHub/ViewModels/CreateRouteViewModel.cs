@@ -186,10 +186,32 @@ namespace CadBIMHub.ViewModels
         private void Import()
         {
             var importWindow = new Views.ImportRouteWindow();
-            if (importWindow.ShowDialog() == true)
+            var importVM = importWindow.DataContext as ImportRouteViewModel;
+            
+            if (importVM != null)
             {
-                // Handle imported data if needed
+                importVM.CloseAction = () => importWindow.Close();
+                importVM.FileImported = (importedRoutes) =>
+                {
+                    // Thêm các routes đã import vào danh sách
+                    foreach (var route in importedRoutes)
+                    {
+                        route.PropertyChanged += (s, e) =>
+                        {
+                            if (e.PropertyName != nameof(RouteDetailModel.IsSelected))
+                            {
+                                HasChanges = true;
+                            }
+                        };
+                        RouteDetailList.Add(route);
+                    }
+                    
+                    HasChanges = true;
+                    importWindow.Close();
+                };
             }
+            
+            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalWindow(importWindow);
         }
 
 

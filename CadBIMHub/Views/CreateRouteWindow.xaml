@@ -9,10 +9,6 @@
         MinWidth="800"
         WindowStartupLocation="CenterScreen"
         Background="White">
-    <Window.DataContext>
-        <vm:CreateRouteViewModel/>
-    </Window.DataContext>
-
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -116,7 +112,6 @@
                                 </Style.Triggers>
                             </Style>
                             
-                            <!-- Style for input borders to look rounded -->
                             <Style x:Key="InputBorderStyle" TargetType="Border">
                                 <Setter Property="CornerRadius" Value="4"/>
                                 <Setter Property="BorderBrush" Value="#ccc"/>
@@ -138,7 +133,6 @@
                         </DataGrid.ColumnHeaderStyle>
                         
                         <DataGrid.Columns>
-                            <!-- Checkbox Column with Select All -->
                             <DataGridTemplateColumn Width="40">
                                 <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
@@ -156,8 +150,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-
-                            <!-- Text Column: Ten Lo -->
                             <DataGridTemplateColumn Header="Tên lộ" Width="60">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -170,7 +162,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- TextBox Column: Batch -->
                             <DataGridTemplateColumn Header="Batch" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -183,7 +174,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- TextBox Column: ItemGroup -->
                             <DataGridTemplateColumn Header="Nhóm vật tư" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -196,7 +186,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- TextBox Column: ItemDescription -->
                             <DataGridTemplateColumn Header="Vật tư" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -209,7 +198,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- TextBox Column: Size -->
                             <DataGridTemplateColumn Header="Kích thước" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -222,7 +210,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- Text Column: Ky Hieu -->
                             <DataGridTemplateColumn Header="Ký hiệu" Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -235,7 +222,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- Text Column: So Luong -->
                             <DataGridTemplateColumn Header="Số lượng" Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -248,7 +234,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- Actions -->
                             <DataGridTemplateColumn Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

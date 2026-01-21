@@ -9,6 +9,7 @@ namespace CadBIMHub.Views
         public ImportRouteWindow()
         {
             InitializeComponent();
+            DataContext = new ViewModels.ImportRouteViewModel();
         }
 
         private void Window_Drop(object sender, DragEventArgs e)

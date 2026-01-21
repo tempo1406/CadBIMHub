@@ -7,6 +7,7 @@ namespace CadBIMHub.Views
         public CreateRouteWindow()
         {
             InitializeComponent();
+            DataContext = new ViewModels.CreateRouteViewModel();
         }
     }
 }

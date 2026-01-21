@@ -13,10 +13,6 @@
         Drop="Window_Drop"
         DragOver="Window_DragOver">
     
-    <Window.DataContext>
-        <vm:ImportRouteViewModel/>
-    </Window.DataContext>
-
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
