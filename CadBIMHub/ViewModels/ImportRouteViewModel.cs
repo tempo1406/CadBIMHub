@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using CadBIMHub.Helpers;
@@ -20,11 +22,16 @@ namespace CadBIMHub.ViewModels
         private int _headerRow;
         private int _startRow;
         private int _endRow;
+        private int _currentStep;
+        private bool _hasValidRoutes;
+        private int _validCount;
+        private int _invalidCount;
 
         public ImportRouteViewModel()
         {
             InitializeCommands();
             InitializeDefaults();
+            ValidationList = new ObservableCollection<ImportRouteValidationModel>();
         }
 
         private void InitializeCommands()
@@ -32,6 +39,8 @@ namespace CadBIMHub.ViewModels
             CancelCommand = new RelayCommand(Cancel);
             NextCommand = new RelayCommand(Next, CanNext);
             DownloadTemplateCommand = new RelayCommand(DownloadTemplate);
+            BackCommand = new RelayCommand(Back);
+            ImportCommand = new RelayCommand(Import, CanImport);
         }
 
         private void InitializeDefaults()
@@ -39,9 +48,12 @@ namespace CadBIMHub.ViewModels
             HeaderRow = 0;
             StartRow = 0;
             EndRow = 0;
+            CurrentStep = 1;
         }
 
         #region Properties
+        public ObservableCollection<ImportRouteValidationModel> ValidationList { get; set; }
+
         public string SelectedFilePath
         {
             get => _selectedFilePath;
@@ -104,9 +116,54 @@ namespace CadBIMHub.ViewModels
             }
         }
 
+        public int CurrentStep
+        {
+            get => _currentStep;
+            set
+            {
+                _currentStep = value;
+                OnPropertyChanged(nameof(CurrentStep));
+                OnPropertyChanged(nameof(IsStep1));
+                OnPropertyChanged(nameof(IsStep2));
+            }
+        }
+
+        public bool IsStep1 => CurrentStep == 1;
+        public bool IsStep2 => CurrentStep == 2;
+
         public Visibility FileSelectedVisibility
         {
             get => string.IsNullOrEmpty(SelectedFilePath) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public bool HasValidRoutes
+        {
+            get => _hasValidRoutes;
+            set
+            {
+                _hasValidRoutes = value;
+                OnPropertyChanged(nameof(HasValidRoutes));
+            }
+        }
+
+        public int ValidCount
+        {
+            get => _validCount;
+            set
+            {
+                _validCount = value;
+                OnPropertyChanged(nameof(ValidCount));
+            }
+        }
+
+        public int InvalidCount
+        {
+            get => _invalidCount;
+            set
+            {
+                _invalidCount = value;
+                OnPropertyChanged(nameof(InvalidCount));
+            }
         }
         #endregion
 
@@ -114,6 +171,8 @@ namespace CadBIMHub.ViewModels
         public ICommand CancelCommand { get; private set; }
         public ICommand NextCommand { get; private set; }
         public ICommand DownloadTemplateCommand { get; private set; }
+        public ICommand BackCommand { get; private set; }
+        public ICommand ImportCommand { get; private set; }
 
         public Action CloseAction { get; set; }
         public Action<List<RouteDetailModel>> FileImported { get; set; }
@@ -174,26 +233,67 @@ namespace CadBIMHub.ViewModels
                     return;
                 }
 
-                // M? c?a s? validation
-                var validationWindow = new Views.ImportValidationWindow();
-                var validationVM = validationWindow.DataContext as ViewModels.ImportValidationViewModel;
-                
-                if (validationVM != null)
-                {
-                    validationVM.LoadValidationData(validationData);
-                    validationVM.CloseAction = () => validationWindow.Close();
-                    validationVM.OnImportSuccess = (routes) =>
-                    {
-                        FileImported?.Invoke(routes);
-                    };
-                }
-
-                Autodesk.AutoCAD.ApplicationServices.Application.ShowModalWindow(validationWindow);
+                LoadValidationData(validationData);
+                CurrentStep = 2;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi import file: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void Back()
+        {
+            CurrentStep = 1;
+        }
+
+        private bool CanImport()
+        {
+            return ValidationList.Any(v => v.IsValid);
+        }
+
+        private void Import()
+        {
+            var validRoutes = ValidationList.Where(v => v.IsValid).ToList();
+
+            if (validRoutes.Count == 0)
+            {
+                MessageBox.Show("Không có lộ hợp lệ để import", "Thông báo", 
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var invalidCount = ValidationList.Count - validRoutes.Count;
+            
+            if (invalidCount > 0)
+            {
+                var message = $"Có {invalidCount}/{ValidationList.Count} dòng dữ liệu không hợp lệ. " +
+                             $"Bạn có muốn bỏ qua các dòng dữ liệu này và chỉ thực hiện nhập dữ liệu ở các dòng còn lại không?";
+
+                var result = MessageBox.Show(message, "Nhập dữ liệu từ tệp",
+                    MessageBoxButton.OKCancel, MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.OK)
+                    return;
+            }
+
+            var routesToImport = validRoutes.Select(v => new RouteDetailModel
+            {
+                RouteName = v.RouteName,
+                BatchNo = v.BatchNo,
+                ItemGroup = v.ItemGroup,
+                ItemDescription = v.ItemDescription,
+                Size = v.Size,
+                Symbol = v.Symbol,
+                Quantity = v.Quantity
+            }).ToList();
+
+            FileImported?.Invoke(routesToImport);
+
+            MessageBox.Show($"Đã import thành công {routesToImport.Count} lộ!", "Thành công",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            CloseAction?.Invoke();
         }
 
         private void DownloadTemplate()
@@ -242,7 +342,7 @@ namespace CadBIMHub.ViewModels
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "Excel Files|*.xlsx;*.xls;*.xlsb;*.xlsm",
-                Title = "Ch?n file Excel"
+                Title = "Chọn file Excel"
             };
 
             if (openFileDialog.ShowDialog() == true)
@@ -252,6 +352,19 @@ namespace CadBIMHub.ViewModels
                 
                 DetectExcelStructureAuto();
             }
+        }
+
+        public void LoadValidationData(List<ImportRouteValidationModel> data)
+        {
+            ValidationList.Clear();
+            foreach (var item in data)
+            {
+                ValidationList.Add(item);
+            }
+
+            ValidCount = ValidationList.Count(v => v.IsValid);
+            InvalidCount = ValidationList.Count - ValidCount;
+            HasValidRoutes = ValidCount > 0;
         }
 
         private void DetectExcelStructureAuto()

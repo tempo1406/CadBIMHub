@@ -15,10 +15,10 @@ namespace CadBIMHub.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private string _selectedDieuKien;
-        private string _selectedKhongGian;
-        private string _selectedGoiCongViec;
-        private string _selectedGiaiDoan;
+        private string _selectedInstallationCondition;
+        private string _selectedInstallationSpace;
+        private string _selectedWorkPackage;
+        private string _selectedPhase;
         private int _selectedCount;
         private bool _hasChanges;
 
@@ -38,34 +38,6 @@ namespace CadBIMHub.ViewModels
         {
             BatchList = new ObservableCollection<BatchInfoModel>();
             RouteDetailList = new ObservableCollection<RouteDetailModel>();
-            
-            DieuKienLapDatList = new ObservableCollection<string> 
-            { 
-                "Điều kiện 1", 
-                "Điều kiện 2", 
-                "Điều kiện 3" 
-            };
-            
-            KhongGianLapDatList = new ObservableCollection<string> 
-            { 
-                "Không gian 1", 
-                "Không gian 2", 
-                "Không gian 3" 
-            };
-            
-            GoiCongViecList = new ObservableCollection<string> 
-            { 
-                "Gói 1", 
-                "Gói 2", 
-                "Gói 3" 
-            };
-            
-            GiaiDoanList = new ObservableCollection<string> 
-            { 
-                "Giai đoạn 1", 
-                "Giai đoạn 2", 
-                "Giai đoạn 3" 
-            };
         }
 
         private void InitializeCommands()
@@ -84,50 +56,46 @@ namespace CadBIMHub.ViewModels
         #region Collections
         public ObservableCollection<BatchInfoModel> BatchList { get; set; }
         public ObservableCollection<RouteDetailModel> RouteDetailList { get; set; }
-        public ObservableCollection<string> DieuKienLapDatList { get; set; }
-        public ObservableCollection<string> KhongGianLapDatList { get; set; }
-        public ObservableCollection<string> GoiCongViecList { get; set; }
-        public ObservableCollection<string> GiaiDoanList { get; set; }
         #endregion
 
         #region Properties
-        public string SelectedDieuKien
+        public string SelectedInstallationCondition
         {
-            get => _selectedDieuKien;
+            get => _selectedInstallationCondition;
             set
             {
-                _selectedDieuKien = value;
-                OnPropertyChanged(nameof(SelectedDieuKien));
+                _selectedInstallationCondition = value;
+                OnPropertyChanged(nameof(SelectedInstallationCondition));
             }
         }
 
-        public string SelectedKhongGian
+        public string SelectedInstallationSpace
         {
-            get => _selectedKhongGian;
+            get => _selectedInstallationSpace;
             set
             {
-                _selectedKhongGian = value;
-                OnPropertyChanged(nameof(SelectedKhongGian));
+                _selectedInstallationSpace = value;
+                OnPropertyChanged(nameof(SelectedInstallationSpace));
             }
         }
 
-        public string SelectedGoiCongViec
+        public string SelectedWorkPackage
         {
-            get => _selectedGoiCongViec;
+            get => _selectedWorkPackage;
             set
             {
-                _selectedGoiCongViec = value;
-                OnPropertyChanged(nameof(SelectedGoiCongViec));
+                _selectedWorkPackage = value;
+                OnPropertyChanged(nameof(SelectedWorkPackage));
             }
         }
 
-        public string SelectedGiaiDoan
+        public string SelectedPhase
         {
-            get => _selectedGiaiDoan;
+            get => _selectedPhase;
             set
             {
-                _selectedGiaiDoan = value;
-                OnPropertyChanged(nameof(SelectedGiaiDoan));
+                _selectedPhase = value;
+                OnPropertyChanged(nameof(SelectedPhase));
             }
         }
 
@@ -175,10 +143,10 @@ namespace CadBIMHub.ViewModels
             var batch = new BatchInfoModel
             {
                 BatchCode = string.Format("B{0:D3}", BatchList.Count + 1),
-                InstallationCondition = SelectedDieuKien,
-                InstallationSpace = SelectedKhongGian,
-                WorkPackage = SelectedGoiCongViec,
-                Phase = SelectedGiaiDoan
+                InstallationCondition = SelectedInstallationCondition,
+                InstallationSpace = SelectedInstallationSpace,
+                WorkPackage = SelectedWorkPackage,
+                Phase = SelectedPhase
             };
             BatchList.Add(batch);
         }

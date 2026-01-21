@@ -1,4 +1,5 @@
 using System.Windows;
+using CadBIMHub.ViewModels;
 
 namespace CadBIMHub.Views
 {
@@ -7,7 +8,9 @@ namespace CadBIMHub.Views
         public CreateRouteWindow()
         {
             InitializeComponent();
-            DataContext = new ViewModels.CreateRouteViewModel();
+            var viewModel = new CreateRouteViewModel();
+            viewModel.CloseAction = () => this.Close();
+            DataContext = viewModel;
         }
     }
 }

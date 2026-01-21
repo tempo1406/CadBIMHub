@@ -192,7 +192,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="ViewModels\ImportValidationViewModel.cs" />
     <Compile Include="Views\CreateRouteWindow.xaml.cs">
       <DependentUpon>CreateRouteWindow.xaml</DependentUpon>
     </Compile>
@@ -206,9 +205,6 @@
     <Compile Include="Views\ImportRouteWindow.xaml.cs">
       <DependentUpon>ImportRouteWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ImportValidationWindow.xaml.cs">
-      <DependentUpon>ImportValidationWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -219,10 +215,6 @@
     <Compile Include="Views\LogoutWindow.xaml.cs">
       <DependentUpon>LogoutWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\ImportValidationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Actions\" />

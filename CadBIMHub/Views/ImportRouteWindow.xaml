@@ -18,129 +18,306 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CadBIMHub;component/Resources/Buttons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="20">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Drop Zone -->
-        <Border Grid.Row="0" 
-                BorderBrush="#ddd" 
-                BorderThickness="2" 
-                CornerRadius="8"
-                Background="#fafafa"
-                AllowDrop="True"
-                Drop="DropZone_Drop"
-                DragOver="DropZone_DragOver"
-                MouseLeftButtonDown="DropZone_Click">
-            <Grid>
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Image Source="/CadBIMHub;component/Resources/Graphicloads-Android-Settings-Cloud.512.png" 
-                               Width="48"
-                               Height="48"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Margin="0,0,0,15"
-                        />
-                   
-                    <TextBlock Text="Nhấp hoặc kéo tệp vào khu vực này để tải tệp lên" 
-                               FontSize="16"
-                               FontWeight="SemiBold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,8"/>
-                    
-                    <TextBlock Text="Chỉ chấp nhận các file Excel (.xlsx, .xls, .xlsb, .xlsm)" 
-                               FontSize="13"
-                               Foreground="#666"
-                               HorizontalAlignment="Center"/>
+        <!-- Content Area -->
+        <Grid Grid.Row="0">
+        <!-- Step 1: File Selection -->
+        <Grid Margin="20" Visibility="{Binding IsStep1, Converter={StaticResource BoolToVis}}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                    <TextBlock Text="{Binding SelectedFileName}" 
-                               FontSize="14"
-                               FontWeight="Bold"
-                               Foreground="#3f51b5"
-                               HorizontalAlignment="Center"
-                               Margin="0,20,0,0"
-                               Visibility="{Binding FileSelectedVisibility}"/>
+            <!-- Drop Zone -->
+            <Border Grid.Row="0" 
+                    BorderBrush="#ddd" 
+                    BorderThickness="2" 
+                    CornerRadius="8"
+                    Background="#fafafa"
+                    AllowDrop="True"
+                    Drop="DropZone_Drop"
+                    DragOver="DropZone_DragOver"
+                    MouseLeftButtonDown="DropZone_Click">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Source="/CadBIMHub;component/Resources/Graphicloads-Android-Settings-Cloud.512.png" 
+                                   Width="48"
+                                   Height="48"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,0,15"
+                            />
+                       
+                        <TextBlock Text="Nhấp hoặc kéo tệp vào khu vực này để tải tệp lên" 
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,8"/>
+                        
+                        <TextBlock Text="Chỉ chấp nhận các file Excel (.xlsx, .xls, .xlsb, .xlsm)" 
+                                   FontSize="13"
+                                   Foreground="#666"
+                                   HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="{Binding SelectedFileName}" 
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="#3f51b5"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,20,0,0"
+                                   Visibility="{Binding FileSelectedVisibility}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1" Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Tên trang tính" Margin="0,0,0,5" FontSize="13"/>
+                    <TextBox Text="{Binding SheetName, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="32" 
+                             VerticalContentAlignment="Center"
+                             Padding="8,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Dòng tiêu đề" Margin="0,0,0,5" FontSize="13"/>
+                    <TextBox Text="{Binding HeaderRow, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="32" 
+                             VerticalContentAlignment="Center"
+                             Padding="8,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Dòng bắt đầu" Margin="0,0,0,5" FontSize="13"/>
+                    <TextBox Text="{Binding StartRow, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="32" 
+                             VerticalContentAlignment="Center"
+                             Padding="8,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="6">
+                    <TextBlock Text="Dòng kết thúc" Margin="0,0,0,5" FontSize="13"/>
+                    <TextBox Text="{Binding EndRow, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="32" 
+                             VerticalContentAlignment="Center"
+                             Padding="8,0"/>
                 </StackPanel>
             </Grid>
-        </Border>
 
-        <Grid Grid.Row="1" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Tên trang tính" Margin="0,0,0,5" FontSize="13"/>
-                <TextBox Text="{Binding SheetName, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="32" 
-                         VerticalContentAlignment="Center"
-                         Padding="8,0"/>
-            </StackPanel>
-
-            <StackPanel Grid.Column="2">
-                <TextBlock Text="Dòng têu đề" Margin="0,0,0,5" FontSize="13"/>
-                <TextBox Text="{Binding HeaderRow, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="32" 
-                         VerticalContentAlignment="Center"
-                         Padding="8,0"/>
-            </StackPanel>
-
-            <StackPanel Grid.Column="4">
-                <TextBlock Text="Dòng bắt đầu" Margin="0,0,0,5" FontSize="13"/>
-                <TextBox Text="{Binding StartRow, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="32" 
-                         VerticalContentAlignment="Center"
-                         Padding="8,0"/>
-            </StackPanel>
-
-            <StackPanel Grid.Column="6">
-                <TextBlock Text="Dòng kết thúc" Margin="0,0,0,5" FontSize="13"/>
-                <TextBox Text="{Binding EndRow, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="32" 
-                         VerticalContentAlignment="Center"
-                         Padding="8,0"/>
-            </StackPanel>
+            <TextBlock Grid.Row="2" 
+                       Margin="0,15,0,20"
+                       HorizontalAlignment="Center">
+                <Hyperlink Command="{Binding DownloadTemplateCommand}" 
+                           TextDecorations="None">
+                    <TextBlock Text="Tải tệp dữ liệu mẫu" 
+                               FontSize="14"
+                               Foreground="#3f51b5"/>
+                </Hyperlink>
+            </TextBlock>
         </Grid>
 
-        <TextBlock Grid.Row="2" 
-                   Margin="0,15,0,0"
-                   HorizontalAlignment="Center">
-            <Hyperlink Command="{Binding DownloadTemplateCommand}" 
-                       TextDecorations="None">
-                <TextBlock Text="Tải tệp dữ liệu mẫu" 
-                           FontSize="14"
-                           Foreground="#3f51b5"/>
-            </Hyperlink>
-        </TextBlock>
+        <!-- Step 2: Validation -->
+        <Grid Margin="10,10,10,0" Visibility="{Binding IsStep2, Converter={StaticResource BoolToVis}}">
+            <DataGrid x:Name="dgValidation"
+                      ItemsSource="{Binding ValidationList}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserResizeColumns="True"
+                      CanUserReorderColumns="False"
+                      CanUserSortColumns="False"
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="All"
+                      BorderThickness="1"
+                      BorderBrush="#d0d0d0"
+                      RowHeaderWidth="0"
+                      Background="White"
+                      RowHeight="35"
+                      HorizontalGridLinesBrush="#e8e8e8"
+                      VerticalGridLinesBrush="#e8e8e8"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+                
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="White"/>
+                        <Setter Property="Focusable" Value="False"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Focusable" Value="False"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="8,0"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+        
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#f5f5f5"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="FontWeight" Value="Normal"/>
+                        <Setter Property="Padding" Value="8,10"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="BorderBrush" Value="#d0d0d0"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Thông báo" Binding="{Binding ValidationMessage}" Width="220" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsValid}" Value="False">
+                                        <Setter Property="Foreground" Value="#d32f2f"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Tên lộ" Binding="{Binding RouteName}" Width="80" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Batch" Binding="{Binding BatchNo}" Width="100" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Nhóm vật tư" Binding="{Binding ItemGroup}" Width="150" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Vật tư" Binding="{Binding ItemDescription}" Width="200" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Kích thước" Binding="{Binding Size}" Width="100" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Ký hiệu" Binding="{Binding Symbol}" Width="80" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Số lượng" Binding="{Binding Quantity}" Width="90" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="8,0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        </Grid>
 
-        <StackPanel Grid.Row="3" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
-                    Margin="0,20,0,0">
-            <Button Content="Hủy" 
-                    Width="100" 
-                    Height="35"
-                    Margin="0,0,10,0"
-                    Style="{StaticResource BtnGreyOutline}"
-                    Command="{Binding CancelCommand}"/>
-            <Button Content="Tiếp theo" 
-                    Width="100" 
-                    Height="35"
-                    Style="{StaticResource BtnBlueFilled}"
-                    Command="{Binding NextCommand}"/>
-        </StackPanel>
+        <!-- Footer - Button Area (Always at the same position) -->
+        <Border Grid.Row="1" 
+                Background="White" 
+                BorderBrush="#dee2e6" 
+                BorderThickness="0,1,0,0"
+                Padding="20,15,20,15">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button Content="Hủy" 
+                        Width="100" 
+                        Height="35"
+                        Margin="0,0,10,0"
+                        Style="{StaticResource BtnGreyOutline}"
+                        Command="{Binding CancelCommand}"/>
+                
+                <!-- Step 2: Quay lại button -->
+                <Button Content="Quay lại" 
+                        Width="100" 
+                        Height="35"
+                        Margin="0,0,10,0"
+                        Style="{StaticResource BtnGreyOutline}"
+                        Command="{Binding BackCommand}"
+                        Visibility="{Binding IsStep2, Converter={StaticResource BoolToVis}}"/>
+                
+                <!-- Step 1: Tiếp theo button -->
+                <Button Content="Tiếp theo" 
+                        Width="100" 
+                        Height="35"
+                        Style="{StaticResource BtnBlueFilled}"
+                        Command="{Binding NextCommand}"
+                        Visibility="{Binding IsStep1, Converter={StaticResource BoolToVis}}"/>
+                
+                <!-- Step 2: Import lộ button -->
+                <Button Content="Import lộ" 
+                        Width="100" 
+                        Height="35"
+                        Style="{StaticResource BtnBlueFilled}"
+                        Command="{Binding ImportCommand}"
+                        IsEnabled="{Binding HasValidRoutes}"
+                        Visibility="{Binding IsStep2, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
