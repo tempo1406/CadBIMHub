@@ -101,6 +101,30 @@ namespace CadBIMHub
                 ed.WriteMessage("\nLỗi khi tạo lộ: " + ex.Message);
             }
         }
+
+        [CommandMethod("CADBIM_CREATE_ATTRIBUTE")]
+        public void CreateAttribute()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Editor ed = doc.Editor;
+
+            if (!AuthenticationManager.Instance.IsAuthenticated)
+            {
+                ed.WriteMessage("\nBạn cần đăng nhập để sử dụng chức năng này!");
+                return;
+            }
+
+            try
+            {
+                CreateAttributeWindow createAttributeWindow = new CreateAttributeWindow();
+                Application.ShowModalWindow(createAttributeWindow);
+                ed.WriteMessage("\nĐóng cửa sổ tạo thuộc tính");
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage("\nLỗi khi tạo thuộc tính: " + ex.Message);
+            }
+        }
     }
 }
 

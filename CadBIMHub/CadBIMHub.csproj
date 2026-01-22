@@ -152,11 +152,13 @@
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\RibbonStateManager.cs" />
     <Compile Include="Helpers\SimpleJsonParser.cs" />
+    <Compile Include="Models\AttributeDetailModel.cs" />
     <Compile Include="Models\BatchInfoModel.cs" />
     <Compile Include="Models\ExcelStructureInfo.cs" />
     <Compile Include="Models\ImportRouteValidationModel.cs" />
     <Compile Include="Models\RouteDetailModel.cs" />
     <Compile Include="Models\RouteItemDto.cs" />
+    <Compile Include="ViewModels\CreateAttributeViewModel.cs" />
     <Compile Include="ViewModels\CreateRouteViewModel.cs" />
     <Compile Include="ViewModels\ImportRouteViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -188,10 +190,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\CreateAttributeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CreateRouteWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Compile Include="Views\CreateAttributeWindow.xaml.cs">
+      <DependentUpon>CreateAttributeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CreateRouteWindow.xaml.cs">
       <DependentUpon>CreateRouteWindow.xaml</DependentUpon>
     </Compile>
