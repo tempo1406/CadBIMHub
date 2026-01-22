@@ -86,7 +86,7 @@ namespace CadBIMHub
 
             if (!AuthenticationManager.Instance.IsAuthenticated)
             {
-                ed.WriteMessage("\nBan can dang nhap de su dung chuc nang nay!");
+                ed.WriteMessage("\nBạn cần đăng nhập để sử dụng chức năng này!");
                 return;
             }
 
@@ -94,54 +94,11 @@ namespace CadBIMHub
             {
                 CreateRouteWindow createRouteWindow = new CreateRouteWindow();
                 Application.ShowModalWindow(createRouteWindow);
-                ed.WriteMessage("\nDong cua so Tao lo");
+                ed.WriteMessage("\nĐóng cửa sổ tạo lộ");
             }
             catch (System.Exception ex)
             {
-                ed.WriteMessage("\nLoi khi tao lo: " + ex.Message);
-            }
-        }
-
-        [CommandMethod("CADBIM_LOAD_DATA")]
-        public void LoadData()
-        {
-            Document doc = Application.DocumentManager.MdiActiveDocument;
-            Editor ed = doc.Editor;
-
-            try
-            {
-                var routes = Helpers.DictionaryManager.LoadRoutesFromDrawing(doc.Database);
-                var batches = Helpers.DictionaryManager.LoadBatchesFromDrawing(doc.Database);
-
-                ed.WriteMessage("\n=== CADBIMHUB DATA ===");
-                ed.WriteMessage("\nSo luong Routes: {0}", routes.Count);
-                ed.WriteMessage("\nSo luong Batches: {0}", batches.Count);
-
-                if (routes.Count > 0)
-                {
-                    ed.WriteMessage("\n\n--- ROUTES ---");
-                    foreach (var route in routes)
-                    {
-                        ed.WriteMessage("\n{0} | {1} | {2} | {3} | {4} | {5} | {6}",
-                            route.RouteName, route.BatchNo, route.ItemGroup, route.ItemDescription,
-                            route.Size, route.Symbol, route.Quantity);
-                    }
-                }
-
-                if (batches.Count > 0)
-                {
-                    ed.WriteMessage("\n\n--- BATCHES ---");
-                    foreach (var batch in batches)
-                    {
-                        ed.WriteMessage("\n{0} | {1} | {2} | {3} | {4}",
-                            batch.BatchCode, batch.InstallationCondition, batch.InstallationSpace,
-                            batch.WorkPackage, batch.Phase);
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                ed.WriteMessage("\nLoi khi load data: " + ex.Message);
+                ed.WriteMessage("\nLỗi khi tạo lộ: " + ex.Message);
             }
         }
     }
