@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace CadBIMHub.ViewModels
         private string _selectedRouteName;
         private bool _isSelectByObject;
         private bool _isSelectByLayer;
+        private List<RouteDetailModel> _allRoutes;
 
         public CreateAttributeViewModel()
         {
@@ -28,6 +30,7 @@ namespace CadBIMHub.ViewModels
             RouteNameList = new ObservableCollection<string>();
             AttributeDetailList = new ObservableCollection<AttributeDetailModel>();
             
+            LoadRoutesFromDrawing();
             LoadRouteNames();
         }
 
@@ -59,6 +62,7 @@ namespace CadBIMHub.ViewModels
             {
                 _selectedRouteName = value;
                 OnPropertyChanged(nameof(SelectedRouteName));
+                LoadRoutesByName(value);
             }
         }
 
@@ -110,7 +114,6 @@ namespace CadBIMHub.ViewModels
 
         private void SelectObject()
         {
-            // TODO: Implement object selection logic
             System.Windows.MessageBox.Show("Chức năng chọn đối tượng sẽ được triển khai sau", "Thông báo",
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
@@ -119,7 +122,6 @@ namespace CadBIMHub.ViewModels
         {
             try
             {
-                // TODO: Implement assign logic
                 System.Windows.MessageBox.Show("Chức năng gán thuộc tính sẽ được triển khai sau", "Thông báo",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 
@@ -138,22 +140,44 @@ namespace CadBIMHub.ViewModels
         }
         #endregion
 
-        private void LoadRouteNames()
+        private void LoadRoutesFromDrawing()
         {
             try
             {
                 var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 if (doc != null)
                 {
-                    var routes = DictionaryManager.LoadRoutesFromDrawing(doc.Database);
-                    RouteNameList.Clear();
-                    
-                    foreach (var route in routes)
+                    _allRoutes = DictionaryManager.LoadRoutesFromDrawing(doc.Database);
+                }
+                else
+                {
+                    _allRoutes = new List<RouteDetailModel>();
+                }
+            }
+            catch (Exception)
+            {
+                _allRoutes = new List<RouteDetailModel>();
+            }
+        }
+
+        private void LoadRouteNames()
+        {
+            try
+            {
+                RouteNameList.Clear();
+                
+                if (_allRoutes != null && _allRoutes.Count > 0)
+                {
+                    var uniqueRouteNames = _allRoutes
+                        .Where(r => !string.IsNullOrEmpty(r.RouteName))
+                        .Select(r => r.RouteName)
+                        .Distinct()
+                        .OrderBy(r => r)
+                        .ToList();
+
+                    foreach (var routeName in uniqueRouteNames)
                     {
-                        if (!string.IsNullOrEmpty(route.RouteName) && !RouteNameList.Contains(route.RouteName))
-                        {
-                            RouteNameList.Add(route.RouteName);
-                        }
+                        RouteNameList.Add(routeName);
                     }
 
                     if (RouteNameList.Count > 0)
@@ -161,13 +185,36 @@ namespace CadBIMHub.ViewModels
                         SelectedRouteName = RouteNameList[0];
                     }
                 }
+                else
+                {
+                    return;
+                }
             }
             catch (Exception)
             {
-                RouteNameList.Add("s1");
-                RouteNameList.Add("s2");
-                RouteNameList.Add("s3");
-                SelectedRouteName = "s2";
+                return;
+            }
+        }
+
+        private void LoadRoutesByName(string routeName)
+        {
+            AttributeDetailList.Clear();
+
+            if (string.IsNullOrEmpty(routeName) || _allRoutes == null)
+                return;
+
+            var routesForSelectedName = _allRoutes
+                .Where(r => r.RouteName == routeName)
+                .ToList();
+
+            foreach (var route in routesForSelectedName)
+            {
+                var attribute = new AttributeDetailModel
+                {
+                    Symbol = route.Symbol,
+                    Quantity = route.Quantity
+                };
+                AttributeDetailList.Add(attribute);
             }
         }
 

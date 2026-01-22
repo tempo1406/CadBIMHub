@@ -29,9 +29,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Content Area -->
         <Grid Grid.Row="0">
-        <!-- Step 1: File Selection -->
         <Grid Margin="20" Visibility="{Binding IsStep1, Converter={StaticResource BoolToVis}}" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -39,7 +37,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Drop Zone -->
             <Border Grid.Row="0" 
                     BorderBrush="#ddd" 
                     BorderThickness="2" 
@@ -137,7 +134,6 @@
             </TextBlock>
         </Grid>
 
-        <!-- Step 2: Validation -->
         <Grid Margin="10,10,10,0" Visibility="{Binding IsStep2, Converter={StaticResource BoolToVis}}">
             <DataGrid x:Name="dgValidation"
                       ItemsSource="{Binding ValidationList}"
@@ -277,7 +273,6 @@
         </Grid>
         </Grid>
 
-        <!-- Footer - Button Area (Always at the same position) -->
         <Border Grid.Row="1" 
                 Background="White" 
                 BorderBrush="#dee2e6" 
@@ -292,7 +287,6 @@
                         Style="{StaticResource BtnGreyOutline}"
                         Command="{Binding CancelCommand}"/>
                 
-                <!-- Step 2: Quay lại button -->
                 <Button Content="Quay lại" 
                         Width="100" 
                         Height="35"
@@ -301,7 +295,6 @@
                         Command="{Binding BackCommand}"
                         Visibility="{Binding IsStep2, Converter={StaticResource BoolToVis}}"/>
                 
-                <!-- Step 1: Tiếp theo button -->
                 <Button Content="Tiếp theo" 
                         Width="100" 
                         Height="35"
@@ -309,7 +302,6 @@
                         Command="{Binding NextCommand}"
                         Visibility="{Binding IsStep1, Converter={StaticResource BoolToVis}}"/>
                 
-                <!-- Step 2: Import lộ button -->
                 <Button Content="Import lộ" 
                         Width="100" 
                         Height="35"
