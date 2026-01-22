@@ -1,6 +1,6 @@
 namespace CadBIMHub.Models
 {
-    public class ExcelStructureInfo
+    public class ExcelStructureInfoModel
     {
         public string SheetName { get; set; }
         public int HeaderRow { get; set; }

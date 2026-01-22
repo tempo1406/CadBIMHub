@@ -20,9 +20,9 @@ namespace CadBIMHub.Helpers
             { "Số lượng", new[] { "so", "luong", "qty", "quantity" } }
         };
 
-        public static ExcelStructureInfo DetectExcelStructure(string filePath)
+        public static ExcelStructureInfoModel DetectExcelStructure(string filePath)
         {
-            var result = new ExcelStructureInfo { IsValid = false };
+            var result = new ExcelStructureInfoModel { IsValid = false };
 
             try
             {

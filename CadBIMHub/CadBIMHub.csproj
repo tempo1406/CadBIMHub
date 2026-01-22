@@ -154,7 +154,7 @@
     <Compile Include="Helpers\SimpleJsonParser.cs" />
     <Compile Include="Models\AttributeDetailModel.cs" />
     <Compile Include="Models\BatchInfoModel.cs" />
-    <Compile Include="Models\ExcelStructureInfo.cs" />
+    <Compile Include="Models\ExcelStructureInfoModel.cs" />
     <Compile Include="Models\ImportRouteValidationModel.cs" />
     <Compile Include="Models\RouteDetailModel.cs" />
     <Compile Include="Models\RouteItemDto.cs" />
