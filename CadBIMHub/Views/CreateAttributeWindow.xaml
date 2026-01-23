@@ -173,12 +173,20 @@
                                          VerticalAlignment="Center"/>
                         </StackPanel>
 
-                        <Button Content="Chọn đối tượng..." 
-                                Width="150" 
-                                Height="32"
-                                HorizontalAlignment="Left"
-                                Style="{StaticResource BtnGreyOutline}"
-                                Command="{Binding SelectObjectCommand}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Button Content="Chọn đối tượng..." 
+                                    Width="150" 
+                                    Height="32"
+                                    HorizontalAlignment="Left"
+                                    Style="{StaticResource BtnGreyOutline}"
+                                    Command="{Binding SelectObjectCommand}"/>
+                            
+                            <TextBlock Text="{Binding SelectedObjectCountText}" 
+                                       VerticalAlignment="Center"
+                                       Margin="15,0,0,0"
+                                       FontStyle="Italic"
+                                       Foreground="#666"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
         </Grid>

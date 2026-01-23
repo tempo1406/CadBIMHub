@@ -146,11 +146,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AppCommands.cs" />
-    <Compile Include="Helpers\AuthenticationManager.cs" />
-    <Compile Include="Helpers\DictionaryManager.cs" />
-    <Compile Include="Helpers\ExcelHelper.cs" />
-    <Compile Include="Helpers\RelayCommand.cs" />
-    <Compile Include="Helpers\RibbonStateManager.cs" />
+    <Compile Include="Actions\AssignAttributeAction.cs" />
+    <Compile Include="Actions\AuthAction.cs" />
+    <Compile Include="Actions\DictionaryAction.cs" />
+    <Compile Include="Actions\ExcelAction.cs" />
+    <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="Actions\RibbonStateAction.cs" />
     <Compile Include="Helpers\SimpleJsonParser.cs" />
     <Compile Include="Models\AttributeDetailModel.cs" />
     <Compile Include="Models\BatchInfoModel.cs" />
@@ -225,9 +226,7 @@
       <DependentUpon>LogoutWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Actions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\Graphicloads-Android-Settings-Cloud.512.png" />
   </ItemGroup>

@@ -17,6 +17,7 @@ namespace CadBIMHub.ViewModels
         private bool _isSelectByObject;
         private bool _isSelectByLayer;
         private List<RouteDetailModel> _allRoutes;
+        private int _selectedObjectCount;
 
         public CreateAttributeViewModel()
         {
@@ -85,6 +86,22 @@ namespace CadBIMHub.ViewModels
                 OnPropertyChanged(nameof(IsSelectByLayer));
             }
         }
+
+        public int SelectedObjectCount
+        {
+            get => _selectedObjectCount;
+            set
+            {
+                _selectedObjectCount = value;
+                OnPropertyChanged(nameof(SelectedObjectCount));
+                OnPropertyChanged(nameof(SelectedObjectCountText));
+            }
+        }
+
+        public string SelectedObjectCountText
+        {
+            get => SelectedObjectCount > 0 ? $"Đã chọn {SelectedObjectCount} đối tượng" : "Chưa chọn đối tượng";
+        }
         #endregion
 
         #region Commands
@@ -114,22 +131,95 @@ namespace CadBIMHub.ViewModels
 
         private void SelectObject()
         {
-            System.Windows.MessageBox.Show("Chức năng chọn đối tượng sẽ được triển khai sau", "Thông báo",
-                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            try
+            {
+                if (!IsSelectByObject)
+                {
+                    System.Windows.MessageBox.Show("Vui lòng chọn chế độ 'Theo đối tượng'", "Thông báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    return;
+                }
+
+                int count;
+                bool success = AssignAttributeAction.SelectPolylineOrMLine(out count);
+
+                if (success)
+                {
+                    SelectedObjectCount = count;
+                    System.Windows.MessageBox.Show($"Đã chọn {count} đối tượng!", "Thành công",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+                else
+                {
+                    SelectedObjectCount = 0;
+                    System.Windows.MessageBox.Show("Không có đối tượng nào được chọn!", "Thông báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Lỗi khi chọn đối tượng: {ex.Message}", "Lỗi",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private void Assign()
         {
             try
             {
-                System.Windows.MessageBox.Show("Chức năng gán thuộc tính sẽ được triển khai sau", "Thông báo",
-                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                
+                if (string.IsNullOrEmpty(SelectedRouteName))
+                {
+                    System.Windows.MessageBox.Show("Vui lòng chọn tên lộ!", "Cảnh báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (AttributeDetailList == null || AttributeDetailList.Count == 0)
+                {
+                    System.Windows.MessageBox.Show("Danh sách thuộc tính trống!", "Cảnh báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
+                int selectedCount = AssignAttributeAction.GetSelectedCount();
+                if (selectedCount == 0)
+                {
+                    System.Windows.MessageBox.Show("Vui lòng chọn đối tượng trước khi gán!", "Cảnh báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
+                var routesForAttribute = _allRoutes?
+                    .Where(r => r.RouteName == SelectedRouteName)
+                    .ToList();
+
+                if (routesForAttribute == null || routesForAttribute.Count == 0)
+                {
+                    System.Windows.MessageBox.Show("Không tìm thấy thông tin route!", "Cảnh báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
                 CloseAction?.Invoke();
+
+                AssignAttributeAction.AssignAttributes(
+                    SelectedRouteName,
+                    AttributeDetailList.ToList(),
+                    routesForAttribute,
+                    (current, total) =>
+                    {
+                        // Progress callback nếu cần
+                    });
+
+                System.Windows.MessageBox.Show("Gán thuộc tính thành công!", "Thành công",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
+                AssignAttributeAction.ClearSelection();
+                SelectedObjectCount = 0;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                System.Windows.MessageBox.Show($"Lỗi: {ex.Message}", "Lỗi",
+                System.Windows.MessageBox.Show($"Lỗi khi gán thuộc tính: {ex.Message}", "Lỗi",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
@@ -147,7 +237,7 @@ namespace CadBIMHub.ViewModels
                 var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 if (doc != null)
                 {
-                    _allRoutes = DictionaryManager.LoadRoutesFromDrawing(doc.Database);
+                    _allRoutes = DictionaryAction.LoadRoutesFromDrawing(doc.Database);
                 }
                 else
                 {

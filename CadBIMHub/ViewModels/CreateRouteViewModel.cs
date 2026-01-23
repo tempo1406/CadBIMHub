@@ -262,9 +262,9 @@ namespace CadBIMHub.ViewModels
 
                 Database db = doc.Database;
 
-                DictionaryManager.SaveRoutesToDrawing(RouteDetailList.ToList(), db);
+                DictionaryAction.SaveRoutesToDrawing(RouteDetailList.ToList(), db);
 
-                DictionaryManager.SaveBatchesToDrawing(BatchList.ToList(), db);
+                DictionaryAction.SaveBatchesToDrawing(BatchList.ToList(), db);
 
                 HasChanges = false;
 
@@ -288,8 +288,8 @@ namespace CadBIMHub.ViewModels
                 {
                     Database db = doc.Database;
 
-                    var routesFromDict = DictionaryManager.LoadRoutesFromDrawing(db);
-                    var batchesFromDict = DictionaryManager.LoadBatchesFromDrawing(db);
+                    var routesFromDict = DictionaryAction.LoadRoutesFromDrawing(db);
+                    var batchesFromDict = DictionaryAction.LoadBatchesFromDrawing(db);
 
                     if (routesFromDict.Count > 0)
                     {

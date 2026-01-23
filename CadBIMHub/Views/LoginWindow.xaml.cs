@@ -79,7 +79,7 @@ namespace CadBIMHub
                 return;
             }
 
-            bool success = AuthenticationManager.Instance.Login(username, password);
+            bool success = AuthAction.Instance.Login(username, password);
 
             if (success)
             {

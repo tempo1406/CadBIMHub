@@ -15,9 +15,9 @@ namespace CadBIMHub
 
         private void LoadCurrentUser()
         {
-            if (AuthenticationManager.Instance.IsAuthenticated)
+            if (AuthAction.Instance.IsAuthenticated)
             {
-                txtCurrentUser.Text = AuthenticationManager.Instance.CurrentUser;
+                txtCurrentUser.Text = AuthAction.Instance.CurrentUser;
             }
             else
             {

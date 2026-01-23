@@ -2,7 +2,7 @@
 
 namespace CadBIMHub
 {
-    public static class RibbonStateManager
+    public static class RibbonStateAction
     {
         private const string LOGIN_BUTTON_ID = "CADBIM_LOGIN";
         private const string LOGOUT_BUTTON_ID = "CADBIM_LOGOUT";
@@ -18,9 +18,9 @@ namespace CadBIMHub
              "CADBIM_SETTING_ASSEMBLY",
         };
 
-        static RibbonStateManager()
+        static RibbonStateAction()
         {
-            AuthenticationManager.Instance.AuthenticationChanged += OnAuthenticationChanged;
+            AuthAction.Instance.AuthenticationChanged += OnAuthenticationChanged;
         }
 
         private static void OnAuthenticationChanged(object sender, AuthenticationChangedEventArgs e)
@@ -30,7 +30,7 @@ namespace CadBIMHub
 
         public static void UpdateRibbonState()
         {
-            bool isAuthenticated = AuthenticationManager.Instance.IsAuthenticated;
+            bool isAuthenticated = AuthAction.Instance.IsAuthenticated;
 
             RibbonControl ribbon = ComponentManager.Ribbon;
             if (ribbon == null) return;

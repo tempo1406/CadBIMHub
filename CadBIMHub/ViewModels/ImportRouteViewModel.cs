@@ -213,12 +213,12 @@ namespace CadBIMHub.ViewModels
                     var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                     if (doc != null)
                     {
-                        existingRoutes = DictionaryManager.LoadRoutesFromDrawing(doc.Database);
+                        existingRoutes = DictionaryAction.LoadRoutesFromDrawing(doc.Database);
                     }
                 }
                 catch { }
 
-                var validationData = ExcelHelper.ReadExcelFile(
+                var validationData = ExcelAction.ReadExcelFile(
                     SelectedFilePath, 
                     SheetName, 
                     HeaderRow, 
@@ -309,7 +309,7 @@ namespace CadBIMHub.ViewModels
 
                 if (saveFileDialog.ShowDialog() == true)
                 {
-                    ExcelHelper.ExportTemplate(saveFileDialog.FileName);
+                    ExcelAction.ExportTemplate(saveFileDialog.FileName);
                     MessageBox.Show($"Đã tải xuống template thành công!", 
                         "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -374,7 +374,7 @@ namespace CadBIMHub.ViewModels
                 if (string.IsNullOrEmpty(SelectedFilePath))
                     return;
 
-                var structureInfo = ExcelHelper.DetectExcelStructure(SelectedFilePath);
+                var structureInfo = ExcelAction.DetectExcelStructure(SelectedFilePath);
                 
                 if (structureInfo.IsValid)
                 {

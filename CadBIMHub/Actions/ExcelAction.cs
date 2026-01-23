@@ -7,7 +7,7 @@ using CadBIMHub.Models;
 
 namespace CadBIMHub.Helpers
 {
-    public class ExcelHelper
+    public class ExcelAction
     {
         private static readonly Dictionary<string, string[]> HeaderPatterns = new Dictionary<string, string[]>
         {
