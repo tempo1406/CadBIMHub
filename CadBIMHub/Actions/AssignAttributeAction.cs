@@ -49,6 +49,78 @@ namespace CadBIMHub.Helpers
             return count > 0;
         }
 
+        public static bool SelectPolylineOrMLineByLayer(out int count, out string layerName)
+        {
+            count = 0;
+            layerName = string.Empty;
+            _selectedObjects.Clear();
+
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            if (doc == null) return false;
+
+            Database db = doc.Database;
+            Editor ed = doc.Editor;
+
+            PromptEntityOptions entityOpts = new PromptEntityOptions("\nChọn 1 đối tượng để nhận diện layer: ");
+            PromptEntityResult entityResult = ed.GetEntity(entityOpts);
+            
+            if (entityResult.Status != PromptStatus.OK)
+                return false;
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    Entity selectedEntity = tr.GetObject(entityResult.ObjectId, OpenMode.ForRead) as Entity;
+                    if (selectedEntity == null)
+                        return false;
+
+                    layerName = selectedEntity.Layer;
+                    tr.Commit();
+                }
+                catch
+                {
+                    tr.Abort();
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrEmpty(layerName))
+                return false;
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    BlockTable bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    foreach (ObjectId objId in btr)
+                    {
+                        Entity ent = tr.GetObject(objId, OpenMode.ForRead) as Entity;
+                        
+                        if (ent != null && ent.Layer == layerName)
+                        {
+                            if (ent is Polyline || ent is Polyline2d || ent is Polyline3d || ent is Mline)
+                            {
+                                _selectedObjects.Add(objId);
+                            }
+                        }
+                    }
+
+                    count = _selectedObjects.Count;
+                    tr.Commit();
+                }
+                catch
+                {
+                    tr.Abort();
+                    return false;
+                }
+            }
+
+            return count > 0;
+        }
+
         public static void AssignAttributes(
             string routeName, 
             List<AttributeDetailModel> attributes,
@@ -80,6 +152,7 @@ namespace CadBIMHub.Helpers
 
             int successCount = 0;
             int totalCount = _selectedObjects.Count;
+            bool isSingleObject = totalCount == 1;
 
             using (Transaction tr = db.TransactionManager.StartTransaction())
             {
@@ -91,8 +164,11 @@ namespace CadBIMHub.Helpers
                         if (ent == null) continue;
 
                         ObjectId oldTextId = ObjectId.Null;
-                        Point3d textPosition = Point3d.Origin;
                         bool hasExistingData = HasXData(ent, out oldTextId);
+
+                        string objectType = GetObjectTypeSuffix(ent);
+                        string newTextContent = CreateAttributeTextContent(routeName, attributes, routeDetails, objectType);
+                        ObjectId newTextId = ObjectId.Null;
 
                         if (hasExistingData)
                         {
@@ -105,52 +181,96 @@ namespace CadBIMHub.Helpers
                             if (result != System.Windows.MessageBoxResult.Yes)
                                 continue;
 
+                            bool updated = false;
                             if (!oldTextId.IsNull && oldTextId.IsValid)
                             {
                                 try
                                 {
                                     DBObject oldObj = tr.GetObject(oldTextId, OpenMode.ForRead);
-                                    if (oldObj is MText oldMText)
+                                    
+                                    if (!oldObj.IsErased)
                                     {
-                                        textPosition = oldMText.Location;
-                                        oldMText.UpgradeOpen();
-                                        oldMText.Erase();
+                                        oldObj.UpgradeOpen();
+                                        
+                                        if (oldObj is MLeader oldMLeader)
+                                        {
+                                            MText mtext = oldMLeader.MText;
+                                            if (mtext != null)
+                                            {
+                                                mtext.Contents = newTextContent;
+                                                oldMLeader.MText = mtext;
+                                                newTextId = oldTextId;
+                                                updated = true;
+                                            }
+                                        }
+                                        else if (oldObj is MText oldMText)
+                                        {
+                                            oldMText.Contents = newTextContent;
+                                            newTextId = oldTextId;
+                                            updated = true;
+                                        }
+                                        
+                                        oldObj.DowngradeOpen();
                                     }
                                 }
-                                catch
+                                catch (System.Exception ex)
                                 {
-                                    textPosition = Point3d.Origin;
+                                    ed.WriteMessage($"\nLỗi khi cập nhật: {ex.Message}");
+                                }
+                            }
+                            
+                            if (!updated)
+                            {
+                                if (isSingleObject)
+                                {
+                                    newTextId = CreateMLeaderInteractive(tr, db, ed, newTextContent);
+                                    if (newTextId.IsNull)
+                                        continue;
+                                }
+                                else
+                                {
+                                    Point3d textPosition = GetAutoTextPosition(ent);
+                                    newTextId = CreateAttributeText(tr, db, textPosition, routeName, attributes, routeDetails, objectType);
                                 }
                             }
                         }
-
-                        if (textPosition == Point3d.Origin)
+                        else
                         {
-                            PromptPointOptions pointOpts = new PromptPointOptions("\nChọn điểm để đặt Text hiển thị thuộc tính: ");
-                            pointOpts.AllowNone = true;
-                            PromptPointResult pointResult = ed.GetPoint(pointOpts);
-
-                            if (pointResult.Status != PromptStatus.OK)
-                                continue;
-
-                            textPosition = pointResult.Value;
+                            if (isSingleObject)
+                            {
+                                newTextId = CreateMLeaderInteractive(tr, db, ed, newTextContent);
+                                if (newTextId.IsNull)
+                                    continue;
+                            }
+                            else
+                            {
+                                Point3d textPosition = GetAutoTextPosition(ent);
+                                newTextId = CreateAttributeText(tr, db, textPosition, routeName, attributes, routeDetails, objectType);
+                            }
                         }
 
-                        ent.UpgradeOpen();
+                        // Cập nhật XData nếu có textId hợp lệ
+                        if (!newTextId.IsNull)
+                        {
+                            ent.UpgradeOpen();
+                            SetXData(ent, routeName, attributes, routeDetails, newTextId);
+                            ent.DowngradeOpen();
 
-                        string objectType = GetObjectTypeSuffix(ent);
-                        ObjectId newTextId = CreateAttributeText(tr, db, textPosition, routeName, attributes, routeDetails, objectType);
-
-                        SetXData(ent, routeName, attributes, routeDetails, newTextId);
-
-                        ent.DowngradeOpen();
-
-                        successCount++;
-                        onProgress?.Invoke(successCount, totalCount);
+                            successCount++;
+                            onProgress?.Invoke(successCount, totalCount);
+                        }
                     }
 
                     tr.Commit();
-                    ed.WriteMessage($"\nĐã gán thuộc tính cho {successCount}/{totalCount} đối tượng");
+                    
+                    if (isSingleObject)
+                    {
+                        ed.WriteMessage($"\nĐã gán thuộc tính cho {successCount} đối tượng (có MText + MLeader)");
+                    }
+                    else
+                    {
+                        ed.WriteMessage($"\nĐã gán thuộc tính cho {successCount}/{totalCount} đối tượng (có MText tự động)");
+                    }
                 }
                 catch (Exception)
                 {
@@ -223,7 +343,9 @@ namespace CadBIMHub.Helpers
             rb.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, XDATA_APP_NAME));
             rb.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, routeName));
             rb.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (short)attributes.Count));
-            rb.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, textId.Handle.ToString()));
+            
+            string handleString = textId.IsNull ? string.Empty : textId.Handle.ToString();
+            rb.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, handleString));
 
             foreach (var attr in attributes)
             {
@@ -242,10 +364,7 @@ namespace CadBIMHub.Helpers
 
         private static string GetObjectTypeSuffix(Entity ent)
         {
-            if (ent is Mline)
-                return "/1";
-            else
-                return "/0";
+            return ent is Mline ? "/1" : "/0";
         }
 
         private static ObjectId CreateAttributeText(
@@ -260,6 +379,26 @@ namespace CadBIMHub.Helpers
             BlockTable bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             BlockTableRecord btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
 
+            string textContent = CreateAttributeTextContent(routeName, attributes, routeDetails, objectTypeSuffix);
+
+            MText mtext = new MText();
+            mtext.Location = position;
+            mtext.Contents = textContent;
+            mtext.TextHeight = 2.5;
+            mtext.Attachment = AttachmentPoint.MiddleLeft;
+
+            ObjectId mtextId = btr.AppendEntity(mtext);
+            tr.AddNewlyCreatedDBObject(mtext, true);
+            
+            return mtextId;
+        }
+
+        private static string CreateAttributeTextContent(
+            string routeName, 
+            List<AttributeDetailModel> attributes,
+            List<RouteDetailModel> routeDetails,
+            string objectTypeSuffix)
+        {
             List<string> qtySymbolParts = new List<string>();
             string lastSize = string.Empty;
             
@@ -277,18 +416,130 @@ namespace CadBIMHub.Helpers
             }
 
             string qtySymbolString = string.Join(",", qtySymbolParts);
-            string textContent = $"{routeName}-{qtySymbolString}-{lastSize}{objectTypeSuffix}";
+            return $"{routeName}-{qtySymbolString}-{lastSize}{objectTypeSuffix}";
+        }
 
-            MText mtext = new MText();
-            mtext.Location = position;
-            mtext.Contents = textContent;
-            mtext.TextHeight = 2.5;
-            mtext.Attachment = AttachmentPoint.MiddleLeft;
-
-            ObjectId mtextId = btr.AppendEntity(mtext);
-            tr.AddNewlyCreatedDBObject(mtext, true);
+        private static ObjectId CreateMLeaderInteractive(Transaction tr, Database db, Editor ed, string textContent)
+        {
+            List<Point3d> leaderPoints = new List<Point3d>();
             
-            return mtextId;
+            PromptPointOptions firstPointOpts = new PromptPointOptions("\nChọn điểm đầu MLeader (gần đối tượng): ");
+            firstPointOpts.AllowNone = false;
+            PromptPointResult firstResult = ed.GetPoint(firstPointOpts);
+
+            if (firstResult.Status != PromptStatus.OK)
+                return ObjectId.Null;
+
+            leaderPoints.Add(firstResult.Value);
+
+            while (true)
+            {
+                PromptPointOptions nextPointOpts = new PromptPointOptions(
+                    leaderPoints.Count == 1 
+                        ? "\nChọn điểm tiếp theo hoặc Enter để kết thúc: " 
+                        : "\nChọn điểm tiếp theo hoặc Enter để kết thúc: ");
+                nextPointOpts.AllowNone = true;
+                nextPointOpts.UseBasePoint = true;
+                nextPointOpts.BasePoint = leaderPoints[leaderPoints.Count - 1];
+                
+                PromptPointResult nextResult = ed.GetPoint(nextPointOpts);
+
+                if (nextResult.Status == PromptStatus.OK)
+                {
+                    leaderPoints.Add(nextResult.Value);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (leaderPoints.Count < 2)
+            {
+                ed.WriteMessage("\nCần ít nhất 2 điểm để tạo MLeader!");
+                return ObjectId.Null;
+            }
+
+            return CreateMLeaderWithContent(tr, db, leaderPoints, textContent);
+        }
+
+        private static ObjectId CreateMLeaderWithContent(Transaction tr, Database db, List<Point3d> points, string textContent)
+        {
+            try
+            {
+                if (points == null || points.Count < 2)
+                    return ObjectId.Null;
+
+                BlockTable bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                BlockTableRecord btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                MLeader mleader = new MLeader();
+                mleader.SetDatabaseDefaults(db);
+
+                int leaderIndex = mleader.AddLeader();
+                int leaderLineIndex = mleader.AddLeaderLine(leaderIndex);
+
+                for (int i = 0; i < points.Count; i++)
+                {
+                    if (i == 0)
+                    {
+                        mleader.AddFirstVertex(leaderLineIndex, points[i]);
+                    }
+                    else
+                    {
+                        mleader.AddLastVertex(leaderLineIndex, points[i]);
+                    }
+                }
+
+                mleader.ContentType = ContentType.MTextContent;
+                
+                MText mtext = new MText();
+                mtext.SetDatabaseDefaults(db);
+                mtext.Contents = textContent;
+                mtext.TextHeight = 2.5;
+                mtext.Attachment = AttachmentPoint.MiddleLeft;
+                mleader.MText = mtext;
+
+                mleader.ArrowSize = 2.5;
+                mleader.EnableLanding = false;
+                mleader.EnableDogleg = false;
+
+                ObjectId mleaderId = btr.AppendEntity(mleader);
+                tr.AddNewlyCreatedDBObject(mleader, true);
+                
+                return mleaderId;
+            }
+            catch (System.Exception ex)
+            {
+                Document doc = Application.DocumentManager.MdiActiveDocument;
+                if (doc != null)
+                {
+                    doc.Editor.WriteMessage($"\nLỗi tạo MLeader với content: {ex.Message}");
+                }
+                return ObjectId.Null;
+            }
+        }
+
+        private static Point3d GetAutoTextPosition(Entity ent)
+        {
+            try
+            {
+                Extents3d ext = ent.GeometricExtents;
+                double offsetX = (ext.MaxPoint.X - ext.MinPoint.X) * 0.1;
+                double offsetY = (ext.MaxPoint.Y - ext.MinPoint.Y) * 0.1;
+                
+                Point3d autoPosition = new Point3d(
+                    ext.MaxPoint.X + offsetX,
+                    ext.MaxPoint.Y + offsetY,
+                    ext.MaxPoint.Z
+                );
+                
+                return autoPosition;
+            }
+            catch
+            {
+                return Point3d.Origin;
+            }
         }
 
         public static int GetSelectedCount()

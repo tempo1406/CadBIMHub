@@ -133,27 +133,54 @@ namespace CadBIMHub.ViewModels
         {
             try
             {
-                if (!IsSelectByObject)
-                {
-                    System.Windows.MessageBox.Show("Vui lòng chọn chế độ 'Theo đối tượng'", "Thông báo",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                    return;
-                }
-
                 int count;
-                bool success = AssignAttributeAction.SelectPolylineOrMLine(out count);
+                bool success;
+                string layerName = string.Empty;
 
-                if (success)
+                if (IsSelectByObject)
                 {
-                    SelectedObjectCount = count;
-                    System.Windows.MessageBox.Show($"Đã chọn {count} đối tượng!", "Thành công",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    success = AssignAttributeAction.SelectPolylineOrMLine(out count);
+                    
+                    if (success)
+                    {
+                        SelectedObjectCount = count;
+                        System.Windows.MessageBox.Show($"Đã chọn {count} đối tượng!", "Thành công",
+                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        SelectedObjectCount = 0;
+                        System.Windows.MessageBox.Show("Không có đối tượng nào được chọn!", "Thông báo",
+                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    }
+                }
+                else if (IsSelectByLayer)
+                {
+                    success = AssignAttributeAction.SelectPolylineOrMLineByLayer(out count, out layerName);
+                    
+                    if (success)
+                    {
+                        SelectedObjectCount = count;
+                        System.Windows.MessageBox.Show(
+                            $"Đã tìm thấy {count} Polyline/MLine trên layer '{layerName}'!", 
+                            "Thành công",
+                            System.Windows.MessageBoxButton.OK, 
+                            System.Windows.MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        SelectedObjectCount = 0;
+                        System.Windows.MessageBox.Show(
+                            "Không tìm thấy Polyline/MLine nào trên layer đã chọn!", 
+                            "Thông báo",
+                            System.Windows.MessageBoxButton.OK, 
+                            System.Windows.MessageBoxImage.Warning);
+                    }
                 }
                 else
                 {
-                    SelectedObjectCount = 0;
-                    System.Windows.MessageBox.Show("Không có đối tượng nào được chọn!", "Thông báo",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    System.Windows.MessageBox.Show("Vui lòng chọn chế độ chọn đối tượng!", "Thông báo",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -208,7 +235,6 @@ namespace CadBIMHub.ViewModels
                     routesForAttribute,
                     (current, total) =>
                     {
-                        // Progress callback nếu cần
                     });
 
                 System.Windows.MessageBox.Show("Gán thuộc tính thành công!", "Thành công",
