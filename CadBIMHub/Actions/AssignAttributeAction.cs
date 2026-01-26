@@ -173,8 +173,8 @@ namespace CadBIMHub.Helpers
                         if (hasExistingData)
                         {
                             var result = System.Windows.MessageBox.Show(
-                                $"Đối tượng {ent.GetType().Name} đã có thuộc tính!\n\nBạn có muốn ghi đè thuộc tính không?",
-                                "Xác nhận ghi đè",
+                                "Bạn có muốn ghi đè thuộc tính không?",
+                                "Ghi đè",
                                 System.Windows.MessageBoxButton.YesNo,
                                 System.Windows.MessageBoxImage.Question);
 
@@ -500,7 +500,7 @@ namespace CadBIMHub.Helpers
                 mtext.Attachment = AttachmentPoint.MiddleLeft;
                 mleader.MText = mtext;
 
-                mleader.ArrowSize = 2.5;
+                mleader.ArrowSymbolId = ObjectId.Null;
                 mleader.EnableLanding = false;
                 mleader.EnableDogleg = false;
 

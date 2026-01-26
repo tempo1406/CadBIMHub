@@ -140,47 +140,12 @@ namespace CadBIMHub.ViewModels
                 if (IsSelectByObject)
                 {
                     success = AssignAttributeAction.SelectPolylineOrMLine(out count);
-                    
-                    if (success)
-                    {
-                        SelectedObjectCount = count;
-                        System.Windows.MessageBox.Show($"Đã chọn {count} đối tượng!", "Thành công",
-                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        SelectedObjectCount = 0;
-                        System.Windows.MessageBox.Show("Không có đối tượng nào được chọn!", "Thông báo",
-                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-                    }
+                    SelectedObjectCount = success ? count : 0;
                 }
                 else if (IsSelectByLayer)
                 {
                     success = AssignAttributeAction.SelectPolylineOrMLineByLayer(out count, out layerName);
-                    
-                    if (success)
-                    {
-                        SelectedObjectCount = count;
-                        System.Windows.MessageBox.Show(
-                            $"Đã tìm thấy {count} Polyline/MLine trên layer '{layerName}'!", 
-                            "Thành công",
-                            System.Windows.MessageBoxButton.OK, 
-                            System.Windows.MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        SelectedObjectCount = 0;
-                        System.Windows.MessageBox.Show(
-                            "Không tìm thấy Polyline/MLine nào trên layer đã chọn!", 
-                            "Thông báo",
-                            System.Windows.MessageBoxButton.OK, 
-                            System.Windows.MessageBoxImage.Warning);
-                    }
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("Vui lòng chọn chế độ chọn đối tượng!", "Thông báo",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    SelectedObjectCount = success ? count : 0;
                 }
             }
             catch (Exception ex)
