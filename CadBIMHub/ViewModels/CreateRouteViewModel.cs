@@ -6,8 +6,10 @@ using System.Linq;
 using System.Windows.Input;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using CadBIMHub.Helpers;
+using CadBIMHub.MVVM;
 using CadBIMHub.Models;
+using CadBIMHub.Services;
+using CadBIMHub.Helpers;
 
 namespace CadBIMHub.ViewModels
 {
@@ -262,9 +264,9 @@ namespace CadBIMHub.ViewModels
 
                 Database db = doc.Database;
 
-                DictionaryAction.SaveRoutesToDrawing(RouteDetailList.ToList(), db);
+                DictionaryService.SaveRoutesToDrawing(RouteDetailList.ToList(), db);
 
-                DictionaryAction.SaveBatchesToDrawing(BatchList.ToList(), db);
+                DictionaryService.SaveBatchesToDrawing(BatchList.ToList(), db);
 
                 HasChanges = false;
 
@@ -288,8 +290,8 @@ namespace CadBIMHub.ViewModels
                 {
                     Database db = doc.Database;
 
-                    var routesFromDict = DictionaryAction.LoadRoutesFromDrawing(db);
-                    var batchesFromDict = DictionaryAction.LoadBatchesFromDrawing(db);
+                    var routesFromDict = DictionaryService.LoadRoutesFromDrawing(db);
+                    var batchesFromDict = DictionaryService.LoadBatchesFromDrawing(db);
 
                     if (routesFromDict.Count > 0)
                     {

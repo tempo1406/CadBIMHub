@@ -1,4 +1,6 @@
 using System.Windows;
+using CadBIMHub.Services;
+
 
 namespace CadBIMHub
 {
@@ -15,9 +17,9 @@ namespace CadBIMHub
 
         private void LoadCurrentUser()
         {
-            if (AuthAction.Instance.IsAuthenticated)
+            if (AuthenticationService.Instance.IsAuthenticated)
             {
-                txtCurrentUser.Text = AuthAction.Instance.CurrentUser;
+                txtCurrentUser.Text = AuthenticationService.Instance.CurrentUser;
             }
             else
             {

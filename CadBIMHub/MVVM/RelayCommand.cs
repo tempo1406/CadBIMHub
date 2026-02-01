@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace CadBIMHub.Helpers
+namespace CadBIMHub.MVVM
 {
     public class RelayCommand : ICommand
     {

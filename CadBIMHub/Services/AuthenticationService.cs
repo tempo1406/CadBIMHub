@@ -1,10 +1,10 @@
 using System;
 
-namespace CadBIMHub
+namespace CadBIMHub.Services
 {
-    public class AuthAction
+    public class AuthenticationService
     {
-        private static AuthAction _instance;
+        private static AuthenticationService _instance;
         private static readonly object _lock = new object();
 
         private const string VALID_USERNAME = "admin";
@@ -15,13 +15,13 @@ namespace CadBIMHub
 
         public event EventHandler<AuthenticationChangedEventArgs> AuthenticationChanged;
 
-        private AuthAction()
+        private AuthenticationService()
         {
             IsAuthenticated = false;
             CurrentUser = string.Empty;
         }
 
-        public static AuthAction Instance
+        public static AuthenticationService Instance
         {
             get
             {
@@ -31,7 +31,7 @@ namespace CadBIMHub
                     {
                         if (_instance == null)
                         {
-                            _instance = new AuthAction();
+                            _instance = new AuthenticationService();
                         }
                     }
                 }

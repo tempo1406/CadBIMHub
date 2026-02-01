@@ -1,8 +1,8 @@
 ﻿using Autodesk.Windows;
 
-namespace CadBIMHub
+namespace CadBIMHub.Services
 {
-    public static class RibbonStateAction
+    public static class RibbonService
     {
         private const string LOGIN_BUTTON_ID = "CADBIM_LOGIN";
         private const string LOGOUT_BUTTON_ID = "CADBIM_LOGOUT";
@@ -18,9 +18,9 @@ namespace CadBIMHub
              "CADBIM_SETTING_ASSEMBLY",
         };
 
-        static RibbonStateAction()
+        static RibbonService()
         {
-            AuthAction.Instance.AuthenticationChanged += OnAuthenticationChanged;
+            AuthenticationService.Instance.AuthenticationChanged += OnAuthenticationChanged;
         }
 
         private static void OnAuthenticationChanged(object sender, AuthenticationChangedEventArgs e)
@@ -30,7 +30,7 @@ namespace CadBIMHub
 
         public static void UpdateRibbonState()
         {
-            bool isAuthenticated = AuthAction.Instance.IsAuthenticated;
+            bool isAuthenticated = AuthenticationService.Instance.IsAuthenticated;
 
             RibbonControl ribbon = ComponentManager.Ribbon;
             if (ribbon == null) return;

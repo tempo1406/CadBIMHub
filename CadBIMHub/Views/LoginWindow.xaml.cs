@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using CadBIMHub.Services;
 
 namespace CadBIMHub
 {
@@ -79,7 +80,7 @@ namespace CadBIMHub
                 return;
             }
 
-            bool success = AuthAction.Instance.Login(username, password);
+            bool success = AuthenticationService.Instance.Login(username, password);
 
             if (success)
             {

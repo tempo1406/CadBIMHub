@@ -4,7 +4,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
-using CadBIMHub.Helpers;
+using CadBIMHub.Services;
+using CadBIMHub.MVVM;
 using CadBIMHub.Models;
 
 namespace CadBIMHub.ViewModels
@@ -139,12 +140,12 @@ namespace CadBIMHub.ViewModels
 
                 if (IsSelectByObject)
                 {
-                    success = AssignAttributeAction.SelectPolylineOrMLine(out count);
+                    success = AttributeService.SelectPolylineOrMLine(out count);
                     SelectedObjectCount = success ? count : 0;
                 }
                 else if (IsSelectByLayer)
                 {
-                    success = AssignAttributeAction.SelectPolylineOrMLineByLayer(out count, out layerName);
+                    success = AttributeService.SelectPolylineOrMLineByLayer(out count, out layerName);
                     SelectedObjectCount = success ? count : 0;
                 }
             }
@@ -173,7 +174,7 @@ namespace CadBIMHub.ViewModels
                     return;
                 }
 
-                int selectedCount = AssignAttributeAction.GetSelectedCount();
+                int selectedCount = AttributeService.GetSelectedCount();
                 if (selectedCount == 0)
                 {
                     System.Windows.MessageBox.Show("Vui lòng chọn đối tượng trước khi gán!", "Cảnh báo",
@@ -194,7 +195,7 @@ namespace CadBIMHub.ViewModels
 
                 CloseAction?.Invoke();
 
-                AssignAttributeAction.AssignAttributes(
+                AttributeService.AssignAttributes(
                     SelectedRouteName,
                     AttributeDetailList.ToList(),
                     routesForAttribute,
@@ -205,7 +206,7 @@ namespace CadBIMHub.ViewModels
                 System.Windows.MessageBox.Show("Gán thuộc tính thành công!", "Thành công",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
 
-                AssignAttributeAction.ClearSelection();
+                AttributeService.ClearSelection();
                 SelectedObjectCount = 0;
             }
             catch (System.Exception ex)
@@ -228,7 +229,7 @@ namespace CadBIMHub.ViewModels
                 var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 if (doc != null)
                 {
-                    _allRoutes = DictionaryAction.LoadRoutesFromDrawing(doc.Database);
+                    _allRoutes = DictionaryService.LoadRoutesFromDrawing(doc.Database);
                 }
                 else
                 {

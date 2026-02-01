@@ -5,9 +5,9 @@ using System.Linq;
 using ClosedXML.Excel;
 using CadBIMHub.Models;
 
-namespace CadBIMHub.Helpers
+namespace CadBIMHub.Services
 {
-    public class ExcelAction
+    public class ExcelService
     {
         private static readonly Dictionary<string, string[]> HeaderPatterns = new Dictionary<string, string[]>
         {

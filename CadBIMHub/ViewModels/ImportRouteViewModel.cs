@@ -8,6 +8,8 @@ using System.Windows;
 using System.Windows.Input;
 using CadBIMHub.Helpers;
 using CadBIMHub.Models;
+using CadBIMHub.MVVM;
+using CadBIMHub.Services;
 using Microsoft.Win32;
 
 namespace CadBIMHub.ViewModels
@@ -213,12 +215,12 @@ namespace CadBIMHub.ViewModels
                     var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                     if (doc != null)
                     {
-                        existingRoutes = DictionaryAction.LoadRoutesFromDrawing(doc.Database);
+                        existingRoutes = DictionaryService.LoadRoutesFromDrawing(doc.Database);
                     }
                 }
                 catch { }
 
-                var validationData = ExcelAction.ReadExcelFile(
+                var validationData = ExcelService.ReadExcelFile(
                     SelectedFilePath, 
                     SheetName, 
                     HeaderRow, 
@@ -309,7 +311,7 @@ namespace CadBIMHub.ViewModels
 
                 if (saveFileDialog.ShowDialog() == true)
                 {
-                    ExcelAction.ExportTemplate(saveFileDialog.FileName);
+                    ExcelService.ExportTemplate(saveFileDialog.FileName);
                     MessageBox.Show($"Đã tải xuống template thành công!", 
                         "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -374,7 +376,7 @@ namespace CadBIMHub.ViewModels
                 if (string.IsNullOrEmpty(SelectedFilePath))
                     return;
 
-                var structureInfo = ExcelAction.DetectExcelStructure(SelectedFilePath);
+                var structureInfo = ExcelService.DetectExcelStructure(SelectedFilePath);
                 
                 if (structureInfo.IsValid)
                 {

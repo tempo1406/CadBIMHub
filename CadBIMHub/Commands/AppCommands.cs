@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using CadBIMHub.Views;
+using CadBIMHub.Services;
 
 namespace CadBIMHub
 {
@@ -13,7 +14,7 @@ namespace CadBIMHub
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
 
-            if (AuthAction.Instance.IsAuthenticated)
+            if (AuthenticationService.Instance.IsAuthenticated)
             {
                 ed.WriteMessage("\nBạn đã đăng nhập rồi!");
                 return;
@@ -26,10 +27,10 @@ namespace CadBIMHub
 
                 if (loginWindow.LoginSuccess)
                 {
-                    ed.WriteMessage("\nĐăng nhập thành công! Chào mừng {0}", 
-                        AuthAction.Instance.CurrentUser);
+                    ed.WriteMessage("\nĐăng nhập thành công! Chào mừng {0}",
+                        AuthenticationService.Instance.CurrentUser);
                     
-                    RibbonStateAction.UpdateRibbonState();
+                    RibbonService.UpdateRibbonState();
                 }
                 else
                 {
@@ -48,7 +49,7 @@ namespace CadBIMHub
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
 
-            if (!AuthAction.Instance.IsAuthenticated)
+            if (!AuthenticationService.Instance.IsAuthenticated)
             {
                 ed.WriteMessage("\nBạn chưa đăng nhập!");
                 return;
@@ -56,16 +57,16 @@ namespace CadBIMHub
 
             try
             {
-                string currentUser = AuthAction.Instance.CurrentUser;
+                string currentUser = AuthenticationService.Instance.CurrentUser;
 
                 LogoutWindow logoutWindow = new LogoutWindow();
                 Application.ShowModalWindow(logoutWindow);
 
                 if (logoutWindow.LogoutConfirmed)
                 {
-                    AuthAction.Instance.Logout();
+                    AuthenticationService.Instance.Logout();
                     ed.WriteMessage("\nĐã đăng xuất! Tạm biệt {0}", currentUser);
-                    RibbonStateAction.UpdateRibbonState();
+                    RibbonService.UpdateRibbonState();
                 }
                 else
                 {
@@ -84,7 +85,7 @@ namespace CadBIMHub
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
 
-            if (!AuthAction.Instance.IsAuthenticated)
+            if (!AuthenticationService.Instance.IsAuthenticated)
             {
                 ed.WriteMessage("\nBạn cần đăng nhập để sử dụng chức năng này!");
                 return;
@@ -108,7 +109,7 @@ namespace CadBIMHub
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
 
-            if (!AuthAction.Instance.IsAuthenticated)
+            if (!AuthenticationService.Instance.IsAuthenticated)
             {
                 ed.WriteMessage("\nBạn cần đăng nhập để sử dụng chức năng này!");
                 return;

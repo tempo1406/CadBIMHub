@@ -146,12 +146,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AppCommands.cs" />
-    <Compile Include="Actions\AssignAttributeAction.cs" />
-    <Compile Include="Actions\AuthAction.cs" />
-    <Compile Include="Actions\DictionaryAction.cs" />
-    <Compile Include="Actions\ExcelAction.cs" />
+    <Compile Include="Services\AttributeService.cs" />
+    <Compile Include="Services\AuthenticationService.cs" />
+    <Compile Include="Services\DictionaryService.cs" />
+    <Compile Include="Services\ExcelService.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
-    <Compile Include="Actions\RibbonStateAction.cs" />
+    <Compile Include="Services\RibbonService.cs" />
     <Compile Include="Helpers\SimpleJsonParser.cs" />
     <Compile Include="Models\AttributeDetailModel.cs" />
     <Compile Include="Models\BatchInfoModel.cs" />

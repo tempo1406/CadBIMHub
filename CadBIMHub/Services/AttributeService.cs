@@ -7,9 +7,9 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using CadBIMHub.Models;
 
-namespace CadBIMHub.Helpers
+namespace CadBIMHub.Services
 {
-    public class AssignAttributeAction
+    public class AttributeService
     {
         private const string XDATA_APP_NAME = "CADBIMHUB_ATTRIBUTES";
         private static List<ObjectId> _selectedObjects = new List<ObjectId>();

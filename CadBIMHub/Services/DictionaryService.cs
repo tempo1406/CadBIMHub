@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using CadBIMHub.Models;
 
-namespace CadBIMHub.Helpers
+namespace CadBIMHub.Services
 {
-    public static class DictionaryAction
+    public static class DictionaryService
     {
         private const string ROUTE_DICT_NAME = "CADBIMHUB_ROUTES";
         private const string BATCH_DICT_NAME = "CADBIMHUB_BATCHES";
